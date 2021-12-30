@@ -1,5 +1,6 @@
 # northstar-dedicated
-Docker image for the Northstar dedicated server.
+
+Docker image for the Northstar dedicated server. **Not ready yet (it'll probably be another day or two).**
 
 ## Versioning
 
@@ -41,11 +42,15 @@ To slim down a Titanfall 2 install, delete the files as specified below.
   - delete `Support`
   - delete `__Installer`
 
+### System requirements
+
+TODO
+
 ### Running with wine
 
-If you want to try running this without Docker or my stub, I've successfully used the following configurations. Note that you will need a full X server running (Xvfb won't do).
+**This is not relevant if you are here for the Docker container.** If you want to try running this without Docker, my stubs, or my custom Wine build, I've successfully used the following configurations. Note that you will need a full X server running (Xvfb won't do).
 
-<table><thead><tr><th colspan="2">Common</th></tr><tbody><tr><td colspan="2"><ul>
+<details><table><thead><tr><th colspan="2">Common</th></tr><tbody><tr><td colspan="2"><ul>
 <li>Fedora 35</li>
 <li>ext4 filesystem</li>
 <li>Wine, either:<ul>
@@ -77,7 +82,7 @@ make -C wine-build install DESTDIR=$PWD/wine-pkg</pre></code>
 <li><code>VULKAN_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json</code></li>
 </ul><p>
 <b>Note:</b> DXVK will always use your physical adapter instead of lavapipe if you have one present unless you patch <a href="https://github.com/doitsujin/dxvk/blob/94674ac45e8a4618c00519e04b254de76aad35a2/src/dxvk/dxvk_device_filter.cpp#L33">this check</a>.
-</p></td></tr></tbody></table>
+</p></td></tr></tbody></table></details>
 
 ### Tracing
 
@@ -95,14 +100,13 @@ Note that I'm not currently accepting contributions (at least until I finish the
 - [X] Figure out how to run it with wined3d + llvmpipe.
 - [X] Figure out how to run it with dxvk + lavapipe.
 - [X] Build minimal version.
-- [ ] Figure out how to run it without an X server.
+- [X] Figure out how to run it without an X server.
 - [X] Build minimal version.
 - [ ] Get it working on ARM64 with Box64 / Hangover / qemu-user.
 
 ### Northstar
 
 - [ ] Create additional patches for optimization where necessary.
-- [ ] Implement a CLI flag to specify the TF2 install folder (so TF2 can be mounted into the container).
 - [ ] Fix console creation so it re-uses the original one.
 - [ ] Expose prometheus metrics?
 
@@ -117,20 +121,22 @@ Note that I'm not currently accepting contributions (at least until I finish the
 - [X] Initial research and API traces.
 - [X] Remove the win32 surface so it can run on xvfb.
 - [X] Neutralize the render loop / presenter.
-- [ ] Finish removing vulkan from dxvk fork by incrementally stubbing / re-implementing APIs.
-  - [ ] Neutralize texture loading and shader compilation, but still return valid buffers where needed.
-- [ ] Remove leftover cruft.
-- [ ] Slim down the build system.
+- [X] Finish removing vulkan from dxvk fork by incrementally stubbing / re-implementing APIs.
+  - [X] Neutralize texture loading and shader compilation, but still return valid buffers where needed.
+- [X] Remove leftover cruft.
+- [X] Slim down the build system.
 
 ### docker
 
-- [ ] Create initial docker image based on Fedora.
+- [X] Create initial docker image based on Fedora.
 - [X] Design versioning scheme.
-- [ ] Create a slimmer docker image from scratch or based on Alpine with custom packages.
+- [X] Create a slimmer docker image from scratch or based on Alpine with custom packages.
+- [X] Figure out a way to be able to mount TF2 read-only without copying it.
 - [ ] Provide config via a custom entrypoint which supports env vars.
 - [ ] Fix Northstar logging.
 - [ ] GitHub actions.
 - [ ] Windows support? (this depends on whether my hook will work on it)
+- [ ] Publish image.
 
 ### misc
 
