@@ -1,0 +1,143 @@
+# Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
+pkgname=northstar-dedicated-wine
+pkgver=6.23
+pkgrel=0
+pkgdesc="Patched Wine build for the Northstar dedicated server"
+
+url="https://www.winehq.org"
+license="LGPL-2.0-or-later"
+
+arch="x86_64"
+provides="wine=${pkgver}"
+subpackages="$pkgname-dev $pkgname-doc"
+depends_dev="$pkgname perl"
+makedepends="autoconf automake bison flex gnutls-dev mingw-w64-gcc mingw-w64-binutils linux-headers"
+
+options="textrels !check"
+source="https://dl.winehq.org/wine/source/6.x/wine-$pkgver.tar.xz
+	rpath.patch
+	createwindow.patch
+	"
+
+builddir="$srcdir/wine-$pkgver"
+
+build() {
+	local _win64 _no_pie
+	case "$CARCH" in
+		x86_64) _win64=--enable-win64;;
+		x86) _no_pie="-no-pie";;
+	esac
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--libdir=/usr/lib \
+		--sysconfdir=/etc \
+		--localstatedir=/var \
+		--without-alsa \
+		--without-capi \
+		--without-coreaudio \
+		--without-cups \
+		--without-dbus \
+		--without-fontconfig \
+		--without-freetype \
+		--without-gettext \
+		--with-gnutls \
+		--without-gphoto \
+		--without-gssapi \
+		--without-gstreamer \
+		--without-inotify \
+		--without-krb5 \
+		--without-ldap \
+		--with-mingw \
+		--without-netapi \
+		--without-openal \
+		--without-opencl \
+		--without-opengl \
+		--without-osmesa \
+		--without-oss \
+		--without-pcap \
+		--without-pulse \
+		--without-sane \
+		--without-sdl \
+		--without-udev \
+		--without-usb \
+		--without-v4l2 \
+		--without-vkd3d \
+		--without-vulkan \
+		--without-x \
+		--without-xcomposite \
+		--without-xcursor \
+		--without-xfixes \
+		--without-xinerama \
+		--without-xinput \
+		--without-xinput2 \
+		--without-xrandr \
+		--without-xrender \
+		--without-xshape \
+		--without-xshm \
+		--without-xxf86vm \
+		$_win64 \
+		--disable-npmshtml --disable-mshtml \
+		--disable-wined3d \
+		--disable-d3d12 \
+		--disable-d3d11 \
+		--disable-d3d10 --disable-d3d10_1 --disable-d3d10core \
+		--disable-d3dx10_33 --disable-d3dx10_34 --disable-d3dx10_35 --disable-d3dx10_36 --disable-d3dx10_37 --disable-d3dx10_38 --disable-d3dx10_39 --disable-d3dx10_40 \
+		--disable-d3dx10_41 --disable-d3dx10_42 --disable-d3dx10_43 --disable-d3dx11_42 --disable-d3dx11_43 \
+		--disable-d3d9 \
+		--disable-d3dx9_24 --disable-d3dx9_25 --disable-d3dx9_26 --disable-d3dx9_27 --disable-d3dx9_28 --disable-d3dx9_29 --disable-d3dx9_30 --disable-d3dx9_31 \
+		--disable-d3dx9_32 --disable-d3dx9_33 --disable-d3dx9_34 --disable-d3dx9_35 --disable-d3dx9_36 --disable-d3dx9_37 --disable-d3dx9_38 --disable-d3dx9_39 \
+		--disable-d3dx9_40 --disable-d3dx9_41 --disable-d3dx9_42 --disable-d3dx9_43 \
+		--disable-d3d8 --disable-d3d8thk \
+		--disable-dxgi \
+		--disable-d3dcompiler_33 --disable-d3dcompiler_34 --disable-d3dcompiler_35 --disable-d3dcompiler_36 --disable-d3dcompiler_37 --disable-d3dcompiler_38 \
+		--disable-d3dcompiler_39 --disable-d3dcompiler_40 --disable-d3dcompiler_41 --disable-d3dcompiler_42 --disable-d3dcompiler_43 --disable-d3dcompiler_46 --disable-d3dcompiler_47
+	make LDFLAGS="$LDFLAGS $_no_pie" \
+		tools/widl/widl \
+		tools/winebuild/winebuild \
+		tools/widl/widl \
+		tools/winebuild/winebuild \
+		tools/winegcc/winegcc \
+		tools/wrc/wrc
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	install -Dm755 tools/wineapploader \
+		"$pkgdir"/usr/bin/wineapploader
+
+	local file
+	for file in msiexec notepad regedit regsvr32 wineboot \
+		winecfg wineconsole winefile winemine winepath
+	do
+		rm "$pkgdir"/usr/bin/$file
+		ln -sf /usr/bin/wineapploader "$pkgdir"/usr/bin/$file
+	done
+}
+
+dev() {
+	default_dev
+
+	install -d "$subpkgdir"/usr/bin
+
+	local file
+	for file in widl wmc wrc winebuild winedump function_grep.pl \
+		 winedbg winemaker winegcc winecpp wineg++
+	do
+		mv "$pkgdir"/usr/bin/$file "$subpkgdir"/usr/bin/
+	done
+}
+
+doc() {
+	default_doc
+	rm -fr "$subpkgdir"/usr/share/man/*.UTF-8
+}
+
+sha512sums="
+3e459b305f472ece00cbf467e14e6cfa7422381cb9242d05e9624487d559f438039aa8c780986469591c9d0f05e384380133dc6fb4ed694355ae42744a78d9b7  wine-6.23.tar.xz
+d42a367d30b93fe36b8d6418d53f3c931debef2e9b77bc73e22fff04f5f0d7b9e6622beb78592c814beb32ca214fb7e9c019c652fb2612c61358ba162a520b9d  rpath.patch
+22621c5096adaa8dcc62cd246a4ec2547b4673e8d5a12cc7ad67cb03804804f24d9d0e6d8d40780f1f42c1219e63e13d0bb8f3e165a73fab05fdb1832e8c91fa  createwindow.patch
+"

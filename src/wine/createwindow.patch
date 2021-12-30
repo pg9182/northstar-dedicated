@@ -1,0 +1,45 @@
+From 696821155a8fa271ee8a17016ac60f362cdb0713 Mon Sep 17 00:00:00 2001
+From: pg9182 <96569817+pg9182@users.noreply.github.com>
+Date: Wed, 29 Dec 2021 12:24:07 -0500
+Subject: [PATCH] user32: Always return success for CreateWindow / ShowWindow
+ on nulldrv
+
+Combined with my d3d11 stub, this allows Northstar to start without X.
+---
+ dlls/user32/driver.c | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/dlls/user32/driver.c b/dlls/user32/driver.c
+index 73f4ee67257..f914333b534 100644
+--- a/dlls/user32/driver.c
++++ b/dlls/user32/driver.c
+@@ -161,16 +161,7 @@ static void CDECL nulldrv_UpdateClipboard(void)
+ 
+ static BOOL CDECL nodrv_CreateWindow( HWND hwnd )
+ {
+-    static int warned;
+-    HWND parent = GetAncestor( hwnd, GA_PARENT );
+-
+-    /* HWND_MESSAGE windows don't need a graphics driver */
+-    if (!parent || parent == get_user_thread_info()->msg_window) return TRUE;
+-    if (warned++) return FALSE;
+-
+-    ERR_(winediag)( "Application tried to create a window, but no driver could be loaded.\n" );
+-    if (driver_load_error[0]) ERR_(winediag)( "%s\n", driver_load_error );
+-    return FALSE;
++    return TRUE;
+ }
+ 
+ static BOOL CDECL nulldrv_CreateDesktopWindow( HWND hwnd )
+@@ -242,7 +233,7 @@ static void CDECL nulldrv_SetWindowText( HWND hwnd, LPCWSTR text )
+ 
+ static UINT CDECL nulldrv_ShowWindow( HWND hwnd, INT cmd, RECT *rect, UINT swp )
+ {
+-    return ~0; /* use default implementation */
++    return 0;
+ }
+ 
+ static LRESULT CDECL nulldrv_SysCommand( HWND hwnd, WPARAM wparam, LPARAM lparam )
+-- 
+2.33.1
+
