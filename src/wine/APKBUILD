@@ -78,7 +78,8 @@ build() {
 		--without-xshm \
 		--without-xxf86vm \
 		$_win64 \
-		--disable-npmshtml --disable-mshtml \
+		--disable-mshtml --disable-npmshtml \
+		--disable-mscoree --disable-fusion \
 		--disable-wined3d \
 		--disable-d3d12 \
 		--disable-d3d11 \
