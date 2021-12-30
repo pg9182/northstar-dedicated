@@ -1,0 +1,25 @@
+# Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
+pkgname=northstar
+pkgver=1.2.2
+pkgrel=0
+pkgdesc="Northstar binaries and mods"
+
+url="https://northstar.tf"
+license="MIT"
+
+arch="x86_64"
+source="https://github.com/R2Northstar/Northstar/releases/download/v${pkgver}/Northstar.release.v${pkgver}.zip"
+
+check() {
+	ls "$srcdir"
+	test -f "$srcdir/NorthstarLauncher.exe"
+	test -f "$srcdir/R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg"
+}
+
+package() {
+	mkdir -p "$pkgdir/usr/lib/northstar"
+	cp -r "$srcdir/." "$pkgdir/usr/lib/northstar/"
+}
+sha512sums="
+13993353ba91dab6788847a5fdfc2bfadd88a911ccee90479d7114a3af0cc38f56d431c320e99a59ce6bbe963148b1efcabb5642f4ccf2a03b27b081ebae26a3  Northstar.release.v1.2.2.zip
+"
