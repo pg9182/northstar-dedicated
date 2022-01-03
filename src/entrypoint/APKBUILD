@@ -1,0 +1,33 @@
+# Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
+pkgname=northstar-dedicated-entrypoint
+pkgver=1
+pkgrel=0
+pkgdesc="Docker entrypoint for the Northstar dedicated server"
+
+url="https://github.com/pg9182/northstar-dedicated"
+license="Zlib"
+
+arch="x86_64"
+makedepends="go"
+# commenting this out so we can build it separately: depends="northstar northstar-dedicated-d3d11 northstar-dedicated-wine xvfb"
+
+options="!check"
+source="
+	go.mod
+	go.sum
+	nsconfig.go
+	nsinit.go
+	nsinstance.go
+	nsoverlay.go
+	nswine.go
+	termios.go
+"
+sha512sums="$(sha512sum $source)"
+
+build() {
+	go build -v -trimpath -o "$builddir/nsdedi" .
+}
+
+package() {
+	install -Dm755 nsdedi "$pkgdir/usr/libexec/nsdedi"
+}
