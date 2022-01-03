@@ -11,13 +11,18 @@ arch="x86_64"
 provides="wine=${pkgver}"
 subpackages="$pkgname-dev $pkgname-doc"
 depends_dev="$pkgname perl"
-makedepends="autoconf automake bison flex gnutls-dev mingw-w64-gcc mingw-w64-binutils linux-headers"
+makedepends="autoconf automake bison flex gnutls-dev libxi-dev mingw-w64-gcc mingw-w64-binutils linux-headers"
+
+# note: I've disabled the CreateWindow patch (which was to remove the need for
+# X11 to run the dedicated server) since it seems to cause time to slow down
+# in-game (possibly caused by the 6+ repeated calls to PeekMessage for the
+# window handle in-between ticks). This will need more debugging later.
 
 options="textrels !check"
 source="https://dl.winehq.org/wine/source/6.x/wine-$pkgver.tar.xz
 	rpath.patch
-	createwindow.patch
 	"
+#	createwindow.patch
 
 builddir="$srcdir/wine-$pkgver"
 
@@ -65,13 +70,13 @@ build() {
 		--without-v4l2 \
 		--without-vkd3d \
 		--without-vulkan \
-		--without-x \
+		--with-x \
 		--without-xcomposite \
 		--without-xcursor \
 		--without-xfixes \
 		--without-xinerama \
 		--without-xinput \
-		--without-xinput2 \
+		--with-xinput2 \
 		--without-xrandr \
 		--without-xrender \
 		--without-xshape \
@@ -94,6 +99,7 @@ build() {
 		--disable-dxgi \
 		--disable-d3dcompiler_33 --disable-d3dcompiler_34 --disable-d3dcompiler_35 --disable-d3dcompiler_36 --disable-d3dcompiler_37 --disable-d3dcompiler_38 \
 		--disable-d3dcompiler_39 --disable-d3dcompiler_40 --disable-d3dcompiler_41 --disable-d3dcompiler_42 --disable-d3dcompiler_43 --disable-d3dcompiler_46 --disable-d3dcompiler_47
+	# TODO: add additional wine disables from my notes after fixing the X11 issue
 	make LDFLAGS="$LDFLAGS $_no_pie" \
 		tools/widl/widl \
 		tools/winebuild/winebuild \
@@ -140,5 +146,5 @@ doc() {
 sha512sums="
 3e459b305f472ece00cbf467e14e6cfa7422381cb9242d05e9624487d559f438039aa8c780986469591c9d0f05e384380133dc6fb4ed694355ae42744a78d9b7  wine-6.23.tar.xz
 d42a367d30b93fe36b8d6418d53f3c931debef2e9b77bc73e22fff04f5f0d7b9e6622beb78592c814beb32ca214fb7e9c019c652fb2612c61358ba162a520b9d  rpath.patch
-22621c5096adaa8dcc62cd246a4ec2547b4673e8d5a12cc7ad67cb03804804f24d9d0e6d8d40780f1f42c1219e63e13d0bb8f3e165a73fab05fdb1832e8c91fa  createwindow.patch
 "
+#22621c5096adaa8dcc62cd246a4ec2547b4673e8d5a12cc7ad67cb03804804f24d9d0e6d8d40780f1f42c1219e63e13d0bb8f3e165a73fab05fdb1832e8c91fa  createwindow.patch
