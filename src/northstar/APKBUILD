@@ -17,6 +17,7 @@ check() {
 }
 
 package() {
+	rm "$srcdir"/*.zip
 	mkdir -p "$pkgdir/usr/lib/northstar"
 	cp -r "$srcdir/." "$pkgdir/usr/lib/northstar/"
 }
