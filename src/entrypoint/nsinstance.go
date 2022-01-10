@@ -171,6 +171,10 @@ func (n *NSInstance) Run() error {
 		if n.Output != nil {
 			fmt.Fprintf(n.Output, "Starting xvfb on display %s...\n", display)
 		}
+
+		// clean up old xvfb lock file
+		os.Remove("/tmp/.X" + strconv.Itoa(*n.Xvfb) + "-lock")
+
 		xvfbCmd := exec.Command("Xvfb", display)
 		xvfbCmd.Env = n.env()
 		xvfbCmd.Stdout = &xb
@@ -209,7 +213,6 @@ func (n *NSInstance) Run() error {
 	for {
 		select {
 		case err := <-xvfbResult:
-			n.sendTerminate(true)
 			if n.Output != nil {
 				io.Copy(n.Output, &xb)
 			}
@@ -249,7 +252,6 @@ func (n *NSInstance) Run() error {
 			}
 
 		case <-ctx.Done(): // parent context is done
-			n.sendTerminate(true)
 			return ctx.Err()
 
 		case title := <-titleCh: // console title changed
@@ -295,7 +297,6 @@ func (n *NSInstance) Run() error {
 					fmt.Fprintf(os.Stderr, "warning: failed to initialize watchdog; engine error hangs will not be detected automatically: %v\n", err)
 				case errors.Is(err, ErrNSWatchdogTimeout):
 					fmt.Fprintf(os.Stderr, "watchdog: triggered (%v); killing server\n", err)
-					n.sendTerminate(true)
 					return err
 				}
 			}
@@ -342,7 +343,10 @@ func (n *NSInstance) sendTerminate(force bool) {
 		return
 	}
 
-	if _, open := <-n.terminated; open {
+	// close the channel if it is open
+	select {
+	case <-n.terminated:
+	default:
 		close(n.terminated)
 	}
 
