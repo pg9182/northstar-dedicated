@@ -208,7 +208,7 @@ func (n *NSInstance) Run() error {
 		status                NSInstanceStatus
 		titleMatchFailCounter int
 		titleRateLimit        = ratelimit(ctx, time.Second/2, 1)
-		watchdog              = CreateWatchdog(time.Minute*4, time.Second*5)
+		watchdog              = CreateWatchdog(time.Minute*4, time.Minute)
 	)
 	for {
 		select {
@@ -445,8 +445,8 @@ func setuppty() (*PTY, error) {
 	}
 
 	// pty config
-	tos.IFlag = BRKINT | IGNPAR | ISTRIP | ICRNL | IUTF8
-	tos.OFlag = OPOST | OCRNL
+	tos.IFlag = BRKINT | IGNPAR | ISTRIP | IGNCR | IUTF8
+	tos.OFlag = OPOST | ONOCR
 	tos.CFlag = CREAD
 	tos.LFlag = ISIG | ICANON
 
