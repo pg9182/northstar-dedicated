@@ -33,7 +33,7 @@ To slim down a Titanfall 2 install, delete the files as specified below.
 
 - delete `vpk/client_sp_* englishclient_sp_*`
 - delete `r2/maps/sp_*`
-- delete `r2/paks/` except for `{common,common_mp,highlight,particle_scripts}{,\(*}.rpak ui{,\(*}.dll`
+- delete `r2/paks/` except for `{patch_master,{common,common_mp,highlight,particle_scripts}{,\(*}}.rpak ui{,\(*}.dll`
 - delete `r2/sound`
 - delete `r2/media`
 - delete `r2/screenshots`
