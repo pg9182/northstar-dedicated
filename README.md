@@ -132,8 +132,8 @@ Note that I'm not currently accepting contributions (at least until I finish the
 - [X] Design versioning scheme.
 - [X] Create a slimmer docker image from scratch or based on Alpine with custom packages.
 - [X] Figure out a way to be able to mount TF2 read-only without copying it.
-- [ ] Provide config via a custom entrypoint which supports env vars.
-- [ ] Fix Northstar logging.
+- [X] Provide config via a custom entrypoint which supports env vars.
+- [X] Fix Northstar logging.
 - [ ] GitHub actions.
 - [ ] Windows support? (this depends on whether my hook will work on it)
 - [ ] Publish image.
