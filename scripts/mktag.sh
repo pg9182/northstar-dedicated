@@ -15,25 +15,36 @@ seg_yymmdd="$(date --utc +%Y%m%d)"
 
 img="$1"; shift
 
+declare -a tags
 for x in $*; do
     case $x in
     "stable")
-        echo "${img}:${seg_ever}-tf${seg_tfver}"
-        echo "${img}:${seg_ever}-tf${seg_tfver}-ns${seg_nsver}"
-        ;;
+        tags+=(
+            "${img}:${seg_ever}-tf${seg_tfver}"
+            "${img}:${seg_ever}-tf${seg_tfver}-ns${seg_nsver}"
+        ) ;;
     "stable-git")
-        echo "${img}:${seg_ever}.${seg_yymmdd}.git${seg_git}-tf${seg_tfver}-ns${seg_nsver}"
-        ;;
+        tags+=(
+            "${img}:${seg_ever}.${seg_yymmdd}.git${seg_git}-tf${seg_tfver}-ns${seg_nsver}"
+        ) ;;
     "dev")
-        echo "${img}:dev"
-        echo "${img}:dev.${seg_yymmdd}"
-        ;;
+        tags+=(
+            "${img}:dev"
+            "${img}:dev.${seg_yymmdd}"
+        ) ;;
     "dev-git")
-        echo "${img}:dev.${seg_yymmdd}.git${seg_git}"
-        ;;
+        tags+=(
+            "${img}:dev.${seg_yymmdd}.git${seg_git}"
+        ) ;;
     *)
         echo "invalid argument: $x" >&2
         exit 1
         ;;
     esac
 done
+
+printf "%s\n" "${tags[@]}"
+
+if [[ ${GITHUB_ACTIONS-} == "true" && -n ${TAGS_GHA_OUTPUT-} ]]; then
+    echo "::set-output name=${TAGS_GHA_OUTPUT}::$(IFS=","; echo "${tags[*]}")"
+fi
