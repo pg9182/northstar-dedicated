@@ -88,6 +88,10 @@ make -C wine-build install DESTDIR=$PWD/wine-pkg</pre></code>
 
 While working on the stubs, I needed to trace which DirectX calls Titanfall uses. You can do this by running it under WineD3D (with llvmpipe so it isn't polluted or made inconsistent by the hardware) and `WINEDEBUG=trace+d3d11,trace+dxgi`. Beware that this may have more than what is directly called by Titanfall due to internal implementation details of WineD3D.
 
+### ARM64
+
+ARM64 support (mostly for running this on the Oracle Free Tier) is currently blocked by [ptitSeb/box64#210](https://github.com/ptitSeb/box64/issues/210). FEX and qemu-user are too slow to run Northstar.
+
 ## TODO
 
 Most of my progress and notes can be found on my repos and gists if anyone's interested. Some of it is also discussed on the NS discord. I've also been adding the most relevant bits to this README as I finalize them.
