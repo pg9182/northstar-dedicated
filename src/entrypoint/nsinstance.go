@@ -28,11 +28,10 @@ type NSInstance struct {
 	Output       io.Writer
 	InfoCallback InfoCallbackFunc
 
-	mu          sync.Mutex    // for reading the pointers, which are initialized when Run is called and not set again (DO NOT HOLD THIS LOCK FOR A LONG TIME)
-	terminated  chan struct{} // close when terminating
-	wait        chan struct{} // closed by run when the instance exits
-	launcherCmd *exec.Cmd
-	waiterCmd   *exec.Cmd
+	mu         sync.Mutex    // for reading the pointers, which are initialized when Run is called and not set again (DO NOT HOLD THIS LOCK FOR A LONG TIME)
+	terminated chan struct{} // close when terminating
+	wait       chan struct{} // closed by run when the instance exits
+	gameCmd    *exec.Cmd
 }
 
 // InfoCallbackFunc is function which will be called when the Northstar
@@ -146,22 +145,17 @@ func (n *NSInstance) Run() error {
 	}
 
 	xvfbResult := make(chan error, 1)
-	launcherResult := make(chan error, 1)
-	waiterResult := make(chan error, 1)
+	gameResult := make(chan error, 1)
 
 	n.mu.Lock()
-	n.launcherCmd = n.winecmd("wine64", append([]string{n.Executable, "-dedicated", "-multiple"}, n.Args...)...)
-	n.launcherCmd.Stdout = pty.Slave
-	n.launcherCmd.Stderr = pty.Slave
-	n.launcherCmd.Stdin = pty.Slave
-	n.launcherCmd.Env = append(n.launcherCmd.Env,
+	n.gameCmd = n.winecmd("wine64", append([]string{n.Executable, "-dedicated", "-multiple"}, n.Args...)...)
+	n.gameCmd.Stdout = pty.Slave
+	n.gameCmd.Stderr = pty.Slave
+	n.gameCmd.Stdin = pty.Slave
+	n.gameCmd.Env = append(n.gameCmd.Env,
 		"WINEPATH="+n.Dir,
 		"WINEDEBUG=fixme-secur32,fixme-bcrypt,fixme-ver,err-wldap32",
 	)
-	n.waiterCmd = n.winecmd("wineserver", "-w")
-	n.launcherCmd.Stdout = pty.Slave
-	n.launcherCmd.Stderr = pty.Slave
-	n.launcherCmd.Stdin = pty.Slave
 	n.mu.Unlock()
 
 	var xb bytes.Buffer
@@ -187,18 +181,23 @@ func (n *NSInstance) Run() error {
 		go func() {
 			xvfbResult <- xvfbCmd.Wait()
 		}()
+		defer func() {
+			if xvfbCmd.ProcessState != nil && !xvfbCmd.ProcessState.Exited() {
+				xvfbCmd.Process.Signal(syscall.SIGKILL)
+			}
+		}()
 		time.Sleep(time.Second * 2)
 
-		n.launcherCmd.Env = append(n.launcherCmd.Env,
+		n.gameCmd.Env = append(n.gameCmd.Env,
 			"DISPLAY="+display,
 		)
 	}
 
-	if err := n.launcherCmd.Start(); err != nil {
-		return fmt.Errorf("failed to start launcher (%q, %q, %q): %w", n.Dir, n.Executable, n.Args, err)
+	if err := n.gameCmd.Start(); err != nil {
+		return fmt.Errorf("failed to start game (%q, %q, %q): %w", n.Dir, n.Executable, n.Args, err)
 	}
 	go func() {
-		launcherResult <- n.launcherCmd.Wait()
+		gameResult <- n.gameCmd.Wait()
 	}()
 
 	const (
@@ -221,34 +220,12 @@ func (n *NSInstance) Run() error {
 			}
 			return fmt.Errorf("xvfb exited prematurely")
 
-		case err := <-launcherResult: // launcher exited (as of v1.3.0, it exits as soon as it starts tf2)
-			if err != nil {
-				return fmt.Errorf("failed to start launcher: %w", err)
-			}
-
+		case err := <-gameResult: // waiter exited
 			select {
 			case <-n.terminated:
 				return fmt.Errorf("server terminated")
 			default:
-			}
-
-			n.mu.Lock()
-			n.launcherCmd = n.winecmd("wineserver", "--wait")
-			n.mu.Unlock()
-
-			if err := n.waiterCmd.Start(); err != nil {
-				return fmt.Errorf("failed to wait for wine to exit: %w", err)
-			}
-			go func() {
-				waiterResult <- n.waiterCmd.Wait()
-			}()
-
-		case <-waiterResult: // waiter exited
-			select {
-			case <-n.terminated:
-				return fmt.Errorf("server terminated")
-			default:
-				return fmt.Errorf("server exited")
+				return fmt.Errorf("server exited: %w", err)
 			}
 
 		case <-ctx.Done(): // parent context is done
@@ -356,21 +333,9 @@ func (n *NSInstance) sendTerminate(force bool) {
 	default:
 	}
 
-	var (
-		launcher = n.launcherCmd != nil && n.launcherCmd.ProcessState != nil && !n.launcherCmd.ProcessState.Exited()
-		waiter   = n.waiterCmd != nil && n.waiterCmd.ProcessState != nil && !n.waiterCmd.ProcessState.Exited()
-	)
-
-	if launcher {
+	if n.gameCmd != nil && n.gameCmd.ProcessState != nil && !n.gameCmd.ProcessState.Exited() {
 		if force {
-			n.launcherCmd.Process.Signal(syscall.SIGKILL)
-		} else {
-			n.launcherCmd.Process.Signal(syscall.SIGTERM)
-		}
-	}
-
-	if launcher || waiter {
-		if force {
+			n.gameCmd.Process.Signal(syscall.SIGKILL)
 			n.winecmd("wineserver", "--kill").Start()
 		} else {
 			n.winecmd("wineboot", "--shutdown").Start()
