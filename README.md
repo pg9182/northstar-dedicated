@@ -21,7 +21,6 @@ These tags will be used for stable versions from the master branch. The major ve
 These tags will be used for the dev branch and for all CI builds.
 
 - `dev.{YYMMDD}.git{short-hash}` (unique tag)
-- `dev` (only for the main dev branch)
 
 ## Titanfall 2
 

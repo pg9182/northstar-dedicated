@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-    echo "usage: $0 image_name (stable|stable-git|dev|dev-git)..."
+    echo "usage: $0 image_name (stable|stable-git|dev-git)..."
     exit 2
 fi
 
@@ -26,11 +26,6 @@ for x in $*; do
     "stable-git")
         tags+=(
             "${img}:${seg_ever}.${seg_yymmdd}.git${seg_git}-tf${seg_tfver}-ns${seg_nsver}"
-        ) ;;
-    "dev")
-        tags+=(
-            "${img}:dev"
-            "${img}:dev.${seg_yymmdd}"
         ) ;;
     "dev-git")
         tags+=(
