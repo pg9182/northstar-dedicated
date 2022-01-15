@@ -54,8 +54,6 @@ FROM scratch
 COPY --from=staging / /
 USER northstar
 RUN /usr/libexec/nsdedi __wineprefix__
-# Note: TF2 doesn't seem to like Docker's userspace port forwarding... I suggest
-# you use host networking for now.
-#EXPOSE 8081/tcp
-#EXPOSE 37015/udp
+EXPOSE 8081/tcp
+EXPOSE 37015/udp
 ENTRYPOINT ["/usr/libexec/nsdedi", "                                                          "]
