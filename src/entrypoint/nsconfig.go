@@ -66,7 +66,11 @@ func (n *NSConfig) ApplyArgs(ax ...string) {
 
 		// shift and get the convar value
 		c, v, ax = x[1:], ax[0], ax[1:]
-		n.Set(c, v, "arg")
+		if _, ok := n.cv[c]; ok {
+			n.Set(c, v, "arg")
+		} else {
+			n.ax = append(n.ax, x, v)
+		}
 	}
 }
 
