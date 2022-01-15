@@ -31,28 +31,55 @@ FROM build AS build-entrypoint
 COPY ./entrypoint/ /nsbuild/src/main/entrypoint
 RUN cd /nsbuild/src/main/entrypoint && sudo chown -R nsbuild . && abuild -r
 
-FROM alpine:3.15 AS staging
-RUN apk add --no-cache gnutls tzdata ca-certificates sudo
-RUN adduser -D northstar && \
-    echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar
-RUN mkdir /mnt/titanfall /mnt/mods
+# these convoluted steps allow us to have alpine+wine, northstar, our custom
+# stuff, and the user+wineprefix in their own layers while keeping the rest flat
+# (also see https://github.com/moby/moby/issues/21950)
 
+FROM base AS pkgstaging-base
+RUN apk add --no-cache gnutls tzdata ca-certificates sudo
 COPY --from=build /etc/apk/keys/ /etc/apk/keys/
 COPY --from=build-wine /nsbuild/packages/main/x86_64/ /tmp/northstar/
 # TODO: remove xvfb once we fix the patches
 RUN apk add --no-cache /tmp/northstar/*.apk xvfb && rm -rf /tmp/northstar
+
+FROM pkgstaging-base AS pkgstaging-1
+COPY --from=build-northstar /nsbuild/packages/main/x86_64/ /tmp/northstar/
+RUN apk add --no-cache /tmp/northstar/*.apk && rm -rf /tmp/northstar
+
+FROM scratch AS pkgstaging-1-diff
+COPY --from=pkgstaging-1 /lib/apk /lib/apk
+COPY --from=pkgstaging-1 /usr/lib/northstar /usr/lib/northstar
+
+FROM pkgstaging-1 AS pkgstaging-2
 COPY --from=build-gfsdk /nsbuild/packages/main/x86_64/ /tmp/northstar/
 RUN apk add --no-cache /tmp/northstar/*.apk && rm -rf /tmp/northstar
 COPY --from=build-d3d11 /nsbuild/packages/main/x86_64/ /tmp/northstar/
 RUN apk add --no-cache /tmp/northstar/*.apk && rm -rf /tmp/northstar
-COPY --from=build-northstar /nsbuild/packages/main/x86_64/ /tmp/northstar/
-RUN apk add --no-cache /tmp/northstar/*.apk && rm -rf /tmp/northstar
 COPY --from=build-entrypoint /nsbuild/packages/main/x86_64/ /tmp/northstar/
 RUN apk add --no-cache /tmp/northstar/*.apk && rm -rf /tmp/northstar
 
-FROM scratch
-COPY --from=staging / /
+FROM scratch AS pkgstaging-2-diff
+COPY --from=pkgstaging-2 /lib/apk /lib/apk
+COPY --from=pkgstaging-2 /usr/lib/northstar-dedicated-gfsdk /usr/lib/northstar-dedicated-gfsdk
+COPY --from=pkgstaging-2 /usr/lib/northstar-dedicated-d3d11 /usr/lib/northstar-dedicated-d3d11
+COPY --from=pkgstaging-2 /usr/libexec/nsdedi /usr/libexec/nsdedi
+
+FROM scratch AS pkgstaging-merged
+COPY --from=pkgstaging-base / /
+COPY --from=pkgstaging-1-diff / /
+COPY --from=pkgstaging-2-diff / /
+
+FROM pkgstaging-merged AS pkgstaging-merged-audit
+RUN { ! apk audit --system | grep -v 'X usr/share/fonts/encodings/encodings.dir' | grep -E '^[MX] ' >&2; } || \
+    { echo "error: missing files, ensure the Dockerfile is up-to-date with the packages" >&2; exit 2; }
+
+FROM pkgstaging-merged AS staging
+RUN adduser -D northstar && \
+    echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
+    mkdir /mnt/titanfall /mnt/mods
 USER northstar
+
+FROM staging
 RUN /usr/libexec/nsdedi __wineprefix__
 EXPOSE 8081/tcp
 EXPOSE 37015/udp
