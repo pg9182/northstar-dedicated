@@ -130,7 +130,7 @@ func (n *NSInstance) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	pty, err := OpenPTY()
+	pty, err := setuppty()
 	if err != nil {
 		return fmt.Errorf("failed to allocate pty: %w", err)
 	}
