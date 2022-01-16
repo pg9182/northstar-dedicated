@@ -61,7 +61,7 @@ RUN apk add --no-cache /tmp/northstar/*.apk && rm -rf /tmp/northstar
 
 FROM scratch AS pkgstaging-2-diff
 COPY --from=pkgstaging-2 /lib/apk /lib/apk
-COPY --from=pkgstaging-1 /etc/apk/world /etc/apk/world
+COPY --from=pkgstaging-2 /etc/apk/world /etc/apk/world
 COPY --from=pkgstaging-2 /usr/lib/northstar-dedicated-gfsdk /usr/lib/northstar-dedicated-gfsdk
 COPY --from=pkgstaging-2 /usr/lib/northstar-dedicated-d3d11 /usr/lib/northstar-dedicated-d3d11
 COPY --from=pkgstaging-2 /usr/libexec/nsdedi /usr/libexec/nsdedi
