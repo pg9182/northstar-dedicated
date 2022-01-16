@@ -52,7 +52,7 @@ To use this docker container, you will need a copy of the Titanfall 2 game files
 - **CPU:** x86_64, at least 4 cores (in the future, it will likely be able to run on 1).
 - **RAM:** 2GB (physical or swap) per instance (it typically peaks to ~1.4GB at launch then settles to around 1GB).
 - **Network:** A 16-player instance generally uses about 7-20 Mbps up (note that pilot game modes tend to use more bandwidth than titan-only ones).
-- **Disk:** With the instructions in the next section, each physical server (the game files are mounted read-only into the container and shared between instances) requires ~5GB for the game files. The container image is currently ~1.2GB, but this will be reduced in a future version. At startup, Titanfall reads ~1.75 GB before it reaches the lobby. Storing the files on tmpfs may improve performance.
+- **Disk:** With the instructions in the next section, each physical server (the game files are mounted read-only into the container and shared between instances) requires ~5GB for the game files. The container image is currently ~600MB, but this will be reduced in a future version. At startup, Titanfall reads ~1.75 GB before it reaches the lobby. Storing the files on tmpfs may improve performance.
 
 ### Reducing the size <a name="qs-reduce-size"></a>
 
