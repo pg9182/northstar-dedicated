@@ -40,7 +40,7 @@ RUN apk add --no-cache gnutls tzdata ca-certificates sudo
 COPY --from=build /etc/apk/keys/ /etc/apk/keys/
 COPY --from=build-wine /nsbuild/packages/main/x86_64/ /tmp/northstar/
 # TODO: remove xvfb once we fix the patches
-RUN apk add --no-cache /tmp/northstar/*.apk xvfb && rm -rf /tmp/northstar
+RUN apk add --no-cache /tmp/northstar/northstar-dedicated-wine-[0-9]*-r*.apk xvfb && rm -rf /tmp/northstar
 
 FROM pkgstaging-base AS pkgstaging-1
 COPY --from=build-northstar /nsbuild/packages/main/x86_64/ /tmp/northstar/
