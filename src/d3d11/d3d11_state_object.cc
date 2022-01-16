@@ -1,3 +1,5 @@
+#include "d3d11_device_child.h"
+#include "d3d11_include.h"
 #include "d3d11_state_object.h"
 
 namespace dxvk {
@@ -8,7 +10,7 @@ namespace dxvk {
 
   }
 
-  
+
   D3D11DeviceContextState::~D3D11DeviceContextState() {
 
   }
@@ -19,7 +21,7 @@ namespace dxvk {
           void**                ppvObject) {
     if (ppvObject == nullptr)
       return E_POINTER;
-    
+
     *ppvObject = nullptr;
 
     if (riid == __uuidof(IUnknown)

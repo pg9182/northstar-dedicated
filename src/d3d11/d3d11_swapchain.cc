@@ -1,6 +1,8 @@
 #include "d3d11_device.h"
+#include "d3d11_include.h"
+#include "d3d11_resource.h"
 #include "d3d11_swapchain.h"
-#include "dxgi_factory.h"
+#include "d3d11_texture.h"
 
 // note: for northstar, the dedicated server loop is separate from the render
 // loop, and the minimized check is nopped, so we can essentially pretend that
@@ -19,23 +21,23 @@ namespace dxvk {
     m_factory   (pFactory),
     m_window    (hWnd),
     m_desc      (*pDesc),
-    m_descFs    (*pFullscreenDesc) {    
+    m_descFs    (*pFullscreenDesc) {
     CreateBackBuffer();
   }
-  
-  
-  D3D11SwapChain::~D3D11SwapChain() { 
+
+
+  D3D11SwapChain::~D3D11SwapChain() {
     if (m_backBuffer)
       m_backBuffer->ReleasePrivate();
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::QueryInterface(REFIID riid, void** ppvObject) {
     if (ppvObject == nullptr)
       return E_POINTER;
 
     *ppvObject = nullptr;
-    
+
     if (riid == __uuidof(IUnknown)
      || riid == __uuidof(IDXGIObject)
      || riid == __uuidof(IDXGIDeviceSubObject)
@@ -47,22 +49,22 @@ namespace dxvk {
       *ppvObject = ref(this);
       return S_OK;
     }
-    
+
     log("warn", str::format(__func__, " Unknown interface query ", riid));
     return E_NOINTERFACE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetParent(REFIID riid, void** ppParent) {
     return m_factory->QueryInterface(riid, ppParent);
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetDevice(REFIID riid, void** ppDevice) {
     return m_parent->QueryInterface(riid, ppDevice);
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetBuffer(UINT Buffer, REFIID riid, void** ppSurface) {
     InitReturnPtr(ppSurface);
     return m_backBuffer->QueryInterface(riid, ppSurface);
@@ -72,8 +74,8 @@ namespace dxvk {
   UINT STDMETHODCALLTYPE D3D11SwapChain::GetCurrentBackBufferIndex() {
     return 0;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetContainingOutput(IDXGIOutput** ppOutput) {
     if (!ppOutput)
       return DXGI_ERROR_INVALID_CALL;
@@ -90,12 +92,12 @@ namespace dxvk {
 
     return adapter->EnumOutputs(0, ppOutput);
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetDesc(DXGI_SWAP_CHAIN_DESC* pDesc) {
     if (!pDesc)
       return E_INVALIDARG;
-    
+
     pDesc->BufferDesc.Width     = m_desc.Width;
     pDesc->BufferDesc.Height    = m_desc.Height;
     pDesc->BufferDesc.RefreshRate = m_descFs.RefreshRate;
@@ -111,39 +113,39 @@ namespace dxvk {
     pDesc->Flags                = m_desc.Flags;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetDesc1(DXGI_SWAP_CHAIN_DESC1* pDesc) {
     if (pDesc == nullptr)
       return E_INVALIDARG;
-    
+
     *pDesc = m_desc;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetBackgroundColor(
           DXGI_RGBA*                pColor) {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetRotation(
           DXGI_MODE_ROTATION*       pRotation) {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetRestrictToOutput(
           IDXGIOutput**             ppRestrictToOutput) {
     InitReturnPtr(ppRestrictToOutput);
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetFrameStatistics(DXGI_FRAME_STATISTICS* pStats) {
     if (!pStats)
       return E_INVALIDARG;
@@ -151,43 +153,43 @@ namespace dxvk {
     *pStats = DXGI_FRAME_STATISTICS();
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetFullscreenState(
           BOOL*         pFullscreen,
           IDXGIOutput** ppTarget) {
     HRESULT hr = S_OK;
-    
+
     if (pFullscreen != nullptr)
       *pFullscreen = !m_descFs.Windowed;
-    
+
     if (ppTarget != nullptr)
       *ppTarget = m_target.ref();
 
     return hr;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetFullscreenDesc(
           DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pDesc) {
     if (pDesc == nullptr)
       return E_INVALIDARG;
-    
+
     *pDesc = m_descFs;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetHwnd(
           HWND*                     pHwnd) {
     if (pHwnd == nullptr)
       return E_INVALIDARG;
-    
+
     *pHwnd = m_window;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetCoreWindow(
           REFIID                    refiid,
           void**                    ppUnk) {
@@ -195,35 +197,35 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetLastPresentCount(UINT* pLastPresentCount) {
     if (pLastPresentCount == nullptr)
       return E_INVALIDARG;
-    
+
     *pLastPresentCount = 0;
     return S_OK;
   }
-  
-  
+
+
   BOOL STDMETHODCALLTYPE D3D11SwapChain::IsTemporaryMonoSupported() {
     return FALSE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::Present(UINT SyncInterval, UINT Flags) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::Present1(
           UINT                      SyncInterval,
           UINT                      PresentFlags,
     const DXGI_PRESENT_PARAMETERS*  pPresentParameters) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::ResizeBuffers(
           UINT        BufferCount,
           UINT        Width,
@@ -232,8 +234,8 @@ namespace dxvk {
           UINT        SwapChainFlags) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::ResizeBuffers1(
           UINT                      BufferCount,
           UINT                      Width,
@@ -246,11 +248,11 @@ namespace dxvk {
   }
 
 
-  HRESULT STDMETHODCALLTYPE D3D11SwapChain::ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters) {    
+  HRESULT STDMETHODCALLTYPE D3D11SwapChain::ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::SetFullscreenState(
           BOOL          Fullscreen,
           IDXGIOutput*  pTarget) {
@@ -260,20 +262,20 @@ namespace dxvk {
     m_descFs.Windowed = !Fullscreen;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::SetBackgroundColor(
     const DXGI_RGBA*                pColor) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::SetRotation(
           DXGI_MODE_ROTATION        Rotation) {
     return S_OK;
   }
-  
-  
+
+
   HANDLE STDMETHODCALLTYPE D3D11SwapChain::GetFrameLatencyWaitableObject() {
     log("stub", __func__);
     return nullptr;
@@ -286,7 +288,7 @@ namespace dxvk {
     return DXGI_ERROR_INVALID_CALL;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetMaximumFrameLatency(
           UINT*                     pMaxLatency) {
     if (!(m_desc.Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT))
@@ -295,7 +297,7 @@ namespace dxvk {
     return S_OK;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::GetSourceSize(
           UINT*                     pWidth,
           UINT*                     pHeight) {
@@ -304,14 +306,14 @@ namespace dxvk {
     return S_OK;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::SetMatrixTransform(
     const DXGI_MATRIX_3X2_F*        pMatrix) {
     log("stub", __func__);
     return DXGI_ERROR_INVALID_CALL;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::SetMaximumFrameLatency(
           UINT                      MaxLatency) {
     return S_OK;
@@ -326,7 +328,7 @@ namespace dxvk {
       return E_INVALIDARG;
     return S_OK;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::CheckColorSpaceSupport(
           DXGI_COLOR_SPACE_TYPE           ColorSpace,
@@ -341,15 +343,15 @@ namespace dxvk {
     return S_OK;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::SetHDRMetaData(
           DXGI_HDR_METADATA_TYPE    Type,
           UINT                      Size,
           void*                     pMetaData) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11SwapChain::SetGammaControl(
           UINT                      NumPoints,
     const DXGI_RGB*                 pGammaCurve) {
@@ -386,12 +388,12 @@ namespace dxvk {
 
     if (m_desc.BufferUsage & DXGI_USAGE_UNORDERED_ACCESS)
       desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
-    
+
     if (m_desc.Flags & DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE)
       desc.MiscFlags |= D3D11_RESOURCE_MISC_GDI_COMPATIBLE;
 
     m_backBuffer = new D3D11Texture2D(m_parent, &desc);
     m_backBuffer->AddRefPrivate();
   }
-  
+
 }

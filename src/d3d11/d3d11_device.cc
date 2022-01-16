@@ -3,6 +3,7 @@
 #include "d3d11_context_def.h"
 #include "d3d11_context_imm.h"
 #include "d3d11_device.h"
+#include "d3d11_include.h"
 #include "d3d11_input_layout.h"
 #include "d3d11_query.h"
 #include "d3d11_resource.h"
@@ -23,46 +24,46 @@ namespace dxvk {
     m_featureFlags  (FeatureFlags) {
     m_context     = new D3D11ImmediateContext(this);
   }
-  
-  
+
+
   D3D11Device::~D3D11Device() {
     m_context = nullptr;
   }
-  
-  
+
+
   ULONG STDMETHODCALLTYPE D3D11Device::AddRef() {
     return m_container->AddRef();
   }
-  
-  
+
+
   ULONG STDMETHODCALLTYPE D3D11Device::Release() {
     return m_container->Release();
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::QueryInterface(REFIID riid, void** ppvObject) {
     return m_container->QueryInterface(riid, ppvObject);
   }
-    
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateBuffer(
     const D3D11_BUFFER_DESC*      pDesc,
     const D3D11_SUBRESOURCE_DATA* pInitialData,
           ID3D11Buffer**          ppBuffer) {
     InitReturnPtr(ppBuffer);
-    
+
     if (!pDesc)
       return E_INVALIDARG;
 
     if (!ppBuffer)
       return S_FALSE;
-    
+
     const Com<D3D11Buffer> buffer = new D3D11Buffer(this, pDesc);
     *ppBuffer = buffer.ref();
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateTexture1D(
     const D3D11_TEXTURE1D_DESC*   pDesc,
     const D3D11_SUBRESOURCE_DATA* pInitialData,
@@ -71,7 +72,7 @@ namespace dxvk {
 
     if (!pDesc)
       return E_INVALIDARG;
-    
+
     D3D11_COMMON_TEXTURE_DESC desc;
     desc.Width          = pDesc->Width;
     desc.Height         = 1;
@@ -85,16 +86,16 @@ namespace dxvk {
     desc.CPUAccessFlags = pDesc->CPUAccessFlags;
     desc.MiscFlags      = pDesc->MiscFlags;
     desc.TextureLayout  = D3D11_TEXTURE_LAYOUT_UNDEFINED;
-    
+
     if (!ppTexture1D)
       return S_FALSE;
-    
+
     const Com<D3D11Texture1D> texture = new D3D11Texture1D(this, &desc);
     *ppTexture1D = texture.ref();
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateTexture2D(
     const D3D11_TEXTURE2D_DESC*   pDesc,
     const D3D11_SUBRESOURCE_DATA* pInitialData,
@@ -116,18 +117,18 @@ namespace dxvk {
     desc.CPUAccessFlags = pDesc->CPUAccessFlags;
     desc.MiscFlags      = pDesc->MiscFlags;
     desc.TextureLayout  = D3D11_TEXTURE_LAYOUT_UNDEFINED;
-    
+
     ID3D11Texture2D1* texture2D = nullptr;
     HRESULT hr = CreateTexture2D1(&desc, pInitialData, ppTexture2D ? &texture2D : nullptr);
 
     if (hr != S_OK)
       return hr;
-    
+
     *ppTexture2D = texture2D;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateTexture2D1(
     const D3D11_TEXTURE2D_DESC1*  pDesc,
     const D3D11_SUBRESOURCE_DATA* pInitialData,
@@ -136,7 +137,7 @@ namespace dxvk {
 
     if (!pDesc)
       return E_INVALIDARG;
-    
+
     D3D11_COMMON_TEXTURE_DESC desc;
     desc.Width          = pDesc->Width;
     desc.Height         = pDesc->Height;
@@ -150,16 +151,16 @@ namespace dxvk {
     desc.CPUAccessFlags = pDesc->CPUAccessFlags;
     desc.MiscFlags      = pDesc->MiscFlags;
     desc.TextureLayout  = pDesc->TextureLayout;
-    
+
     if (!ppTexture2D)
       return S_FALSE;
-    
+
     Com<D3D11Texture2D> texture = new D3D11Texture2D(this, &desc);
     *ppTexture2D = texture.ref();
     return S_OK;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateTexture3D(
     const D3D11_TEXTURE3D_DESC*   pDesc,
     const D3D11_SUBRESOURCE_DATA* pInitialData,
@@ -168,7 +169,7 @@ namespace dxvk {
 
     if (!pDesc)
       return E_INVALIDARG;
-    
+
     D3D11_TEXTURE3D_DESC1 desc;
     desc.Width          = pDesc->Width;
     desc.Height         = pDesc->Height;
@@ -180,18 +181,18 @@ namespace dxvk {
     desc.CPUAccessFlags = pDesc->CPUAccessFlags;
     desc.MiscFlags      = pDesc->MiscFlags;
     desc.TextureLayout  = D3D11_TEXTURE_LAYOUT_UNDEFINED;
-    
+
     ID3D11Texture3D1* texture3D = nullptr;
     HRESULT hr = CreateTexture3D1(&desc, pInitialData, ppTexture3D ? &texture3D : nullptr);
 
     if (hr != S_OK)
       return hr;
-    
+
     *ppTexture3D = texture3D;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateTexture3D1(
     const D3D11_TEXTURE3D_DESC1*  pDesc,
     const D3D11_SUBRESOURCE_DATA* pInitialData,
@@ -200,7 +201,7 @@ namespace dxvk {
 
     if (!pDesc)
       return E_INVALIDARG;
-    
+
     D3D11_COMMON_TEXTURE_DESC desc;
     desc.Width          = pDesc->Width;
     desc.Height         = pDesc->Height;
@@ -214,16 +215,16 @@ namespace dxvk {
     desc.CPUAccessFlags = pDesc->CPUAccessFlags;
     desc.MiscFlags      = pDesc->MiscFlags;
     desc.TextureLayout  = pDesc->TextureLayout;
-    
+
     if (!ppTexture3D)
       return S_FALSE;
-      
+
     Com<D3D11Texture3D> texture = new D3D11Texture3D(this, &desc);
     *ppTexture3D = texture.ref();
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateShaderResourceView(
           ID3D11Resource*                   pResource,
     const D3D11_SHADER_RESOURCE_VIEW_DESC*  pDesc,
@@ -233,21 +234,21 @@ namespace dxvk {
     D3D11_SHADER_RESOURCE_VIEW_DESC1 desc = pDesc
       ? D3D11ShaderResourceView::PromoteDesc(pDesc, 0)
       : D3D11_SHADER_RESOURCE_VIEW_DESC1();
-    
+
     ID3D11ShaderResourceView1* view = nullptr;
 
     HRESULT hr = CreateShaderResourceView1(pResource,
       pDesc    ? &desc : nullptr,
       ppSRView ? &view : nullptr);
-    
+
     if (hr != S_OK)
       return hr;
-    
+
     *ppSRView = view;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateShaderResourceView1(
           ID3D11Resource*                   pResource,
     const D3D11_SHADER_RESOURCE_VIEW_DESC1* pDesc,
@@ -256,29 +257,29 @@ namespace dxvk {
 
     if (!pResource)
       return E_INVALIDARG;
-    
+
     D3D11_COMMON_RESOURCE_DESC resourceDesc;
     GetCommonResourceDesc(pResource, &resourceDesc);
-    
+
     // The description is optional. If omitted, we'll create
     // a view that covers all subresources of the image.
     D3D11_SHADER_RESOURCE_VIEW_DESC1 desc;
-    
+
     if (!pDesc) {
       if (FAILED(D3D11ShaderResourceView::GetDescFromResource(pResource, &desc)))
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
     }
-    
+
     if (!ppSRView)
       return S_FALSE;
-    
+
     *ppSRView = ref(new D3D11ShaderResourceView(this, pResource, &desc));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateUnorderedAccessView(
           ID3D11Resource*                   pResource,
     const D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc,
@@ -288,37 +289,37 @@ namespace dxvk {
     D3D11_UNORDERED_ACCESS_VIEW_DESC1 desc = pDesc
       ? D3D11UnorderedAccessView::PromoteDesc(pDesc, 0)
       : D3D11_UNORDERED_ACCESS_VIEW_DESC1();
-    
+
     ID3D11UnorderedAccessView1* view = nullptr;
 
     HRESULT hr = CreateUnorderedAccessView1(pResource,
       pDesc    ? &desc : nullptr,
       ppUAView ? &view : nullptr);
-    
+
     if (hr != S_OK)
       return hr;
-    
+
     *ppUAView = view;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateUnorderedAccessView1(
           ID3D11Resource*                   pResource,
     const D3D11_UNORDERED_ACCESS_VIEW_DESC1* pDesc,
           ID3D11UnorderedAccessView1**      ppUAView) {
     InitReturnPtr(ppUAView);
-    
+
     if (!pResource)
       return E_INVALIDARG;
-    
+
     D3D11_COMMON_RESOURCE_DESC resourceDesc;
     GetCommonResourceDesc(pResource, &resourceDesc);
 
     // The description is optional. If omitted, we'll create
     // a view that covers all subresources of the image.
     D3D11_UNORDERED_ACCESS_VIEW_DESC1 desc;
-    
+
     if (!pDesc) {
       if (FAILED(D3D11UnorderedAccessView::GetDescFromResource(pResource, &desc)))
         return E_INVALIDARG;
@@ -328,13 +329,13 @@ namespace dxvk {
 
     if (!ppUAView)
       return S_FALSE;
-    
+
     auto uav = new D3D11UnorderedAccessView(this, pResource, &desc);
     *ppUAView = ref(uav);
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateRenderTargetView(
           ID3D11Resource*                   pResource,
     const D3D11_RENDER_TARGET_VIEW_DESC*    pDesc,
@@ -344,21 +345,21 @@ namespace dxvk {
     D3D11_RENDER_TARGET_VIEW_DESC1 desc = pDesc
       ? D3D11RenderTargetView::PromoteDesc(pDesc, 0)
       : D3D11_RENDER_TARGET_VIEW_DESC1();
-    
+
     ID3D11RenderTargetView1* view = nullptr;
 
     HRESULT hr = CreateRenderTargetView1(pResource,
       pDesc    ? &desc : nullptr,
       ppRTView ? &view : nullptr);
-    
+
     if (hr != S_OK)
       return hr;
-    
+
     *ppRTView = view;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateRenderTargetView1(
           ID3D11Resource*                   pResource,
     const D3D11_RENDER_TARGET_VIEW_DESC1*   pDesc,
@@ -369,7 +370,7 @@ namespace dxvk {
       return E_INVALIDARG;
 
     D3D11_RENDER_TARGET_VIEW_DESC1 desc;
-    
+
     if (!pDesc) {
       if (FAILED(D3D11RenderTargetView::GetDescFromResource(pResource, &desc)))
         return E_INVALIDARG;
@@ -379,43 +380,43 @@ namespace dxvk {
 
     if (!ppRTView)
       return S_FALSE;
-    
+
     *ppRTView = ref(new D3D11RenderTargetView(this, pResource, &desc));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDepthStencilView(
           ID3D11Resource*                   pResource,
     const D3D11_DEPTH_STENCIL_VIEW_DESC*    pDesc,
           ID3D11DepthStencilView**          ppDepthStencilView) {
     InitReturnPtr(ppDepthStencilView);
-    
+
     if (pResource == nullptr)
       return E_INVALIDARG;
-    
+
     D3D11_COMMON_RESOURCE_DESC resourceDesc;
     GetCommonResourceDesc(pResource, &resourceDesc);
 
     // The view description is optional. If not defined, it
     // will use the resource's format and all array layers.
     D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-    
+
     if (pDesc == nullptr) {
       if (FAILED(D3D11DepthStencilView::GetDescFromResource(pResource, &desc)))
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
     }
-    
+
     if (ppDepthStencilView == nullptr)
       return S_FALSE;
-    
+
     *ppDepthStencilView = ref(new D3D11DepthStencilView(this, pResource, &desc));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateInputLayout(
     const D3D11_INPUT_ELEMENT_DESC*   pInputElementDescs,
           UINT                        NumElements,
@@ -432,41 +433,41 @@ namespace dxvk {
     if (ppInputLayout != nullptr) {
       *ppInputLayout = ref(new D3D11InputLayout(this));
     }
-    
+
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateVertexShader(
     const void*                       pShaderBytecode,
           SIZE_T                      BytecodeLength,
           ID3D11ClassLinkage*         pClassLinkage,
           ID3D11VertexShader**        ppVertexShader) {
     InitReturnPtr(ppVertexShader);
-    
+
     if (!ppVertexShader)
       return S_FALSE;
-    
+
     *ppVertexShader = ref(new D3D11VertexShader(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateGeometryShader(
     const void*                       pShaderBytecode,
           SIZE_T                      BytecodeLength,
           ID3D11ClassLinkage*         pClassLinkage,
           ID3D11GeometryShader**      ppGeometryShader) {
     InitReturnPtr(ppGeometryShader);
-    
+
     if (!ppGeometryShader)
       return S_FALSE;
-    
+
     *ppGeometryShader = ref(new D3D11GeometryShader(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateGeometryShaderWithStreamOutput(
     const void*                       pShaderBytecode,
           SIZE_T                      BytecodeLength,
@@ -478,81 +479,81 @@ namespace dxvk {
           ID3D11ClassLinkage*         pClassLinkage,
           ID3D11GeometryShader**      ppGeometryShader) {
     InitReturnPtr(ppGeometryShader);
-    
+
     if (!ppGeometryShader)
       return S_FALSE;
-    
+
     *ppGeometryShader = ref(new D3D11GeometryShader(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreatePixelShader(
     const void*                       pShaderBytecode,
           SIZE_T                      BytecodeLength,
           ID3D11ClassLinkage*         pClassLinkage,
           ID3D11PixelShader**         ppPixelShader) {
     InitReturnPtr(ppPixelShader);
-    
+
     if (!ppPixelShader)
       return S_FALSE;
-    
+
     *ppPixelShader = ref(new D3D11PixelShader(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateHullShader(
     const void*                       pShaderBytecode,
           SIZE_T                      BytecodeLength,
           ID3D11ClassLinkage*         pClassLinkage,
           ID3D11HullShader**          ppHullShader) {
     InitReturnPtr(ppHullShader);
-    
+
     if (!ppHullShader)
       return S_FALSE;
-    
+
     *ppHullShader = ref(new D3D11HullShader(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDomainShader(
     const void*                       pShaderBytecode,
           SIZE_T                      BytecodeLength,
           ID3D11ClassLinkage*         pClassLinkage,
           ID3D11DomainShader**        ppDomainShader) {
     InitReturnPtr(ppDomainShader);
-    
+
     if (ppDomainShader == nullptr)
       return S_FALSE;
-    
+
     *ppDomainShader = ref(new D3D11DomainShader(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateComputeShader(
     const void*                       pShaderBytecode,
           SIZE_T                      BytecodeLength,
           ID3D11ClassLinkage*         pClassLinkage,
           ID3D11ComputeShader**       ppComputeShader) {
     InitReturnPtr(ppComputeShader);
-    
+
     if (!ppComputeShader)
       return S_FALSE;
-    
+
     *ppComputeShader = ref(new D3D11ComputeShader(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateClassLinkage(ID3D11ClassLinkage** ppLinkage) {
     *ppLinkage = ref(new D3D11ClassLinkage(this));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateBlendState(
     const D3D11_BLEND_DESC*           pBlendStateDesc,
           ID3D11BlendState**          ppBlendState) {
@@ -560,48 +561,48 @@ namespace dxvk {
 
     if (!pBlendStateDesc)
       return E_INVALIDARG;
-    
+
     D3D11_BLEND_DESC1 desc = D3D11BlendState::PromoteDesc(pBlendStateDesc);
-    
+
     if (ppBlendState != nullptr) {
       *ppBlendState = m_bsStateObjects.Create(this, desc);
       return S_OK;
     } return S_FALSE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateBlendState1(
-    const D3D11_BLEND_DESC1*          pBlendStateDesc, 
+    const D3D11_BLEND_DESC1*          pBlendStateDesc,
           ID3D11BlendState1**         ppBlendState) {
     InitReturnPtr(ppBlendState);
-    
+
     if (!pBlendStateDesc)
       return E_INVALIDARG;
-    
+
     if (ppBlendState != nullptr) {
       *ppBlendState = m_bsStateObjects.Create(this, *pBlendStateDesc);
       return S_OK;
     } return S_FALSE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDepthStencilState(
     const D3D11_DEPTH_STENCIL_DESC*   pDepthStencilDesc,
           ID3D11DepthStencilState**   ppDepthStencilState) {
     InitReturnPtr(ppDepthStencilState);
-    
+
     if (!pDepthStencilDesc)
       return E_INVALIDARG;
 
     D3D11_DEPTH_STENCIL_DESC desc = *pDepthStencilDesc;
-    
+
     if (ppDepthStencilState != nullptr) {
       *ppDepthStencilState = m_dsStateObjects.Create(this, desc);
       return S_OK;
     } return S_FALSE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateRasterizerState(
     const D3D11_RASTERIZER_DESC*      pRasterizerDesc,
           ID3D11RasterizerState**     ppRasterizerState) {
@@ -609,47 +610,47 @@ namespace dxvk {
 
     if (!pRasterizerDesc)
       return E_INVALIDARG;
-    
+
     if (!ppRasterizerState)
       return S_FALSE;
-    
+
     *ppRasterizerState = m_rsStateObjects.Create(this, D3D11RasterizerState::PromoteDesc(pRasterizerDesc));
     return S_OK;
   }
-  
-  
+
+
   HRESULT D3D11Device::CreateRasterizerState1(
-    const D3D11_RASTERIZER_DESC1*     pRasterizerDesc, 
+    const D3D11_RASTERIZER_DESC1*     pRasterizerDesc,
           ID3D11RasterizerState1**    ppRasterizerState) {
     InitReturnPtr(ppRasterizerState);
-    
-    if (!pRasterizerDesc)
-      return E_INVALIDARG;
-    
-    if (!ppRasterizerState)
-      return S_FALSE;
-    
-    *ppRasterizerState = m_rsStateObjects.Create(this, D3D11RasterizerState::PromoteDesc(pRasterizerDesc));
-    return S_OK;
-  }
-  
-  
-  HRESULT D3D11Device::CreateRasterizerState2(
-    const D3D11_RASTERIZER_DESC2*     pRasterizerDesc, 
-          ID3D11RasterizerState2**    ppRasterizerState) {
-    InitReturnPtr(ppRasterizerState);
-    
+
     if (!pRasterizerDesc)
       return E_INVALIDARG;
 
     if (!ppRasterizerState)
       return S_FALSE;
-    
+
+    *ppRasterizerState = m_rsStateObjects.Create(this, D3D11RasterizerState::PromoteDesc(pRasterizerDesc));
+    return S_OK;
+  }
+
+
+  HRESULT D3D11Device::CreateRasterizerState2(
+    const D3D11_RASTERIZER_DESC2*     pRasterizerDesc,
+          ID3D11RasterizerState2**    ppRasterizerState) {
+    InitReturnPtr(ppRasterizerState);
+
+    if (!pRasterizerDesc)
+      return E_INVALIDARG;
+
+    if (!ppRasterizerState)
+      return S_FALSE;
+
     *ppRasterizerState = m_rsStateObjects.Create(this, *pRasterizerDesc);
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateSamplerState(
     const D3D11_SAMPLER_DESC*         pSamplerDesc,
           ID3D11SamplerState**        ppSamplerState) {
@@ -659,15 +660,15 @@ namespace dxvk {
       return E_INVALIDARG;
 
     D3D11_SAMPLER_DESC desc = *pSamplerDesc;
-    
+
     if (ppSamplerState == nullptr)
       return S_FALSE;
-    
+
     *ppSamplerState = m_samplerObjects.Create(this, desc);
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateQuery(
     const D3D11_QUERY_DESC*           pQueryDesc,
           ID3D11Query**               ppQuery) {
@@ -675,7 +676,7 @@ namespace dxvk {
 
     if (!pQueryDesc)
       return E_INVALIDARG;
-    
+
     D3D11_QUERY_DESC1 desc;
     desc.Query       = pQueryDesc->Query;
     desc.MiscFlags   = pQueryDesc->MiscFlags;
@@ -690,8 +691,8 @@ namespace dxvk {
     *ppQuery = query;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateQuery1(
     const D3D11_QUERY_DESC1*          pQueryDesc,
           ID3D11Query1**              ppQuery) {
@@ -699,20 +700,20 @@ namespace dxvk {
 
     if (!pQueryDesc)
       return E_INVALIDARG;
-    
+
     if (!ppQuery)
       return S_FALSE;
-    
+
     *ppQuery = ref(new D3D11Query(this, *pQueryDesc));
     return S_OK;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreatePredicate(
     const D3D11_QUERY_DESC*           pPredicateDesc,
           ID3D11Predicate**           ppPredicate) {
     InitReturnPtr(ppPredicate);
-    
+
     if (!pPredicateDesc)
       return E_INVALIDARG;
 
@@ -725,74 +726,74 @@ namespace dxvk {
       log("warn", str::format("D3D11: Unhandled predicate type: ", pPredicateDesc->Query));
       return E_INVALIDARG;
     }
-    
+
     if (!ppPredicate)
       return S_FALSE;
-    
+
     *ppPredicate = D3D11Query::AsPredicate(ref(new D3D11Query(this, desc)));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateCounter(
     const D3D11_COUNTER_DESC*         pCounterDesc,
           ID3D11Counter**             ppCounter) {
     InitReturnPtr(ppCounter);
-    
+
     log("err", str::format("D3D11: Unsupported counter: ", pCounterDesc->Counter));
     return E_INVALIDARG;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDeferredContext(
           UINT                        ContextFlags,
           ID3D11DeviceContext**       ppDeferredContext) {
     *ppDeferredContext = ref(new D3D11DeferredContext(this, ContextFlags));
     return S_OK;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDeferredContext1(
-          UINT                        ContextFlags, 
+          UINT                        ContextFlags,
           ID3D11DeviceContext1**      ppDeferredContext) {
     *ppDeferredContext = ref(new D3D11DeferredContext(this, ContextFlags));
     return S_OK;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDeferredContext2(
-          UINT                        ContextFlags, 
+          UINT                        ContextFlags,
           ID3D11DeviceContext2**      ppDeferredContext) {
     *ppDeferredContext = ref(new D3D11DeferredContext(this, ContextFlags));
     return S_OK;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDeferredContext3(
-          UINT                        ContextFlags, 
+          UINT                        ContextFlags,
           ID3D11DeviceContext3**      ppDeferredContext) {
     *ppDeferredContext = ref(new D3D11DeferredContext(this, ContextFlags));
     return S_OK;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateDeviceContextState(
-          UINT                        Flags, 
-    const D3D_FEATURE_LEVEL*          pFeatureLevels, 
-          UINT                        FeatureLevels, 
-          UINT                        SDKVersion, 
-          REFIID                      EmulatedInterface, 
-          D3D_FEATURE_LEVEL*          pChosenFeatureLevel, 
+          UINT                        Flags,
+    const D3D_FEATURE_LEVEL*          pFeatureLevels,
+          UINT                        FeatureLevels,
+          UINT                        SDKVersion,
+          REFIID                      EmulatedInterface,
+          D3D_FEATURE_LEVEL*          pChosenFeatureLevel,
           ID3DDeviceContextState**    ppContextState) {
     InitReturnPtr(ppContextState);
 
     if (!pFeatureLevels || FeatureLevels == 0)
       return E_INVALIDARG;
-    
+
     if (EmulatedInterface != __uuidof(ID3D11Device)
      && EmulatedInterface != __uuidof(ID3D11Device1))
       return E_INVALIDARG;
-    
+
     UINT flId;
     for (flId = 0; flId < FeatureLevels; flId++) {
       if (pFeatureLevels[flId] == D3D_FEATURE_LEVEL_11_1 || pFeatureLevels[flId] == D3D_FEATURE_LEVEL_11_0)
@@ -804,17 +805,17 @@ namespace dxvk {
 
     if (pFeatureLevels[flId] > m_featureLevel)
       m_featureLevel = pFeatureLevels[flId];
-    
+
     if (pChosenFeatureLevel)
       *pChosenFeatureLevel = pFeatureLevels[flId];
-    
+
     if (!ppContextState)
       return S_FALSE;
-    
+
     *ppContextState = ref(new D3D11DeviceContextState(this));
     return S_OK;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE D3D11Device::CreateFence(
           UINT64                      InitialValue,
@@ -855,8 +856,8 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::OpenSharedResource1(
           HANDLE      hResource,
           REFIID      ReturnedInterface,
@@ -866,11 +867,11 @@ namespace dxvk {
     return E_NOTIMPL;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11Device::OpenSharedResourceByName(
-          LPCWSTR     lpName, 
-          DWORD       dwDesiredAccess, 
-          REFIID      returnedInterface, 
+          LPCWSTR     lpName,
+          DWORD       dwDesiredAccess,
+          REFIID      returnedInterface,
           void**      ppResource) {
     InitReturnPtr(ppResource);
     log("stub", __func__);
@@ -893,16 +894,16 @@ namespace dxvk {
           UINT*       pFormatSupport) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CheckMultisampleQualityLevels(
           DXGI_FORMAT Format,
           UINT        SampleCount,
           UINT*       pNumQualityLevels) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CheckMultisampleQualityLevels1(
           DXGI_FORMAT Format,
           UINT        SampleCount,
@@ -917,8 +918,8 @@ namespace dxvk {
     pCounterInfo->NumSimultaneousCounters     = 0;
     pCounterInfo->NumDetectableParallelUnits  = 0;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::CheckCounter(
     const D3D11_COUNTER_DESC* pDesc,
           D3D11_COUNTER_TYPE* pType,
@@ -940,40 +941,40 @@ namespace dxvk {
     return S_OK;
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11Device::GetPrivateData(
           REFGUID guid, UINT* pDataSize, void* pData) {
     return m_container->GetPrivateData(guid, pDataSize, pData);
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::SetPrivateData(
           REFGUID guid, UINT DataSize, const void* pData) {
     return m_container->SetPrivateData(guid, DataSize, pData);
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::SetPrivateDataInterface(
           REFGUID guid, const IUnknown* pData) {
     return m_container->SetPrivateDataInterface(guid, pData);
   }
-  
-  
+
+
   D3D_FEATURE_LEVEL STDMETHODCALLTYPE D3D11Device::GetFeatureLevel() {
     return D3D_FEATURE_LEVEL_11_1;
   }
-  
-  
+
+
   UINT STDMETHODCALLTYPE D3D11Device::GetCreationFlags() {
     return m_featureFlags;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::GetDeviceRemovedReason() {
     return S_OK;
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11Device::GetImmediateContext(ID3D11DeviceContext** ppImmediateContext) {
     *ppImmediateContext = m_context.ref();
   }
@@ -982,23 +983,23 @@ namespace dxvk {
   void STDMETHODCALLTYPE D3D11Device::GetImmediateContext1(ID3D11DeviceContext1** ppImmediateContext) {
     *ppImmediateContext = m_context.ref();
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11Device::GetImmediateContext2(ID3D11DeviceContext2** ppImmediateContext) {
     *ppImmediateContext = m_context.ref();
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11Device::GetImmediateContext3(ID3D11DeviceContext3** ppImmediateContext) {
     *ppImmediateContext = m_context.ref();
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::SetExceptionMode(UINT RaiseFlags) {
     return S_OK;
   }
-  
-  
+
+
   UINT STDMETHODCALLTYPE D3D11Device::GetExceptionMode() {
     return 0;
   }
@@ -1030,8 +1031,8 @@ namespace dxvk {
       *pNumSubresourceTilings = 0;
     }
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Device::RegisterDeviceRemovedEvent(
           HANDLE                    hEvent,
           DWORD*                    pdwCookie) {
@@ -1052,19 +1053,19 @@ namespace dxvk {
     m_d3d11Device   (this, FeatureLevel, FeatureFlags) {
 
   }
-  
-  
+
+
   D3D11DXGIDevice::~D3D11DXGIDevice() {
-    
+
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::QueryInterface(REFIID riid, void** ppvObject) {
     if (ppvObject == nullptr)
       return E_POINTER;
 
     *ppvObject = nullptr;
-    
+
     if (riid == __uuidof(IUnknown)
      || riid == __uuidof(IDXGIObject)
      || riid == __uuidof(IDXGIDevice)
@@ -1075,7 +1076,7 @@ namespace dxvk {
       *ppvObject = ref(this);
       return S_OK;
     }
-    
+
     if (riid == __uuidof(ID3D11Device)
      || riid == __uuidof(ID3D11Device1)
      || riid == __uuidof(ID3D11Device2)
@@ -1087,24 +1088,24 @@ namespace dxvk {
     }
 
     if (riid == __uuidof(ID3D11Debug))
-      return E_NOINTERFACE;      
-    
+      return E_NOINTERFACE;
+
     // Undocumented interfaces that are queried by some games
     if (riid == GUID{0xd56e2a4c,0x5127,0x8437,{0x65,0x8a,0x98,0xc5,0xbb,0x78,0x94,0x98}})
       return E_NOINTERFACE;
-    
+
     log("warn", str::format(__func__, " Unknown interface query ", riid));
     return E_NOINTERFACE;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::GetParent(
           REFIID                  riid,
           void**                  ppParent) {
     return m_dxgiAdapter->QueryInterface(riid, ppParent);
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::CreateSurface(
     const DXGI_SURFACE_DESC*    pDesc,
           UINT                  NumSurfaces,
@@ -1113,7 +1114,7 @@ namespace dxvk {
           IDXGISurface**        ppSurface) {
     if (!pDesc || (NumSurfaces && !ppSurface))
       return E_INVALIDARG;
-    
+
     D3D11_TEXTURE2D_DESC desc;
     desc.Width          = pDesc->Width;
     desc.Height         = pDesc->Height;
@@ -1194,29 +1195,29 @@ namespace dxvk {
 
     return hr;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::GetAdapter(
           IDXGIAdapter**        pAdapter) {
     if (pAdapter == nullptr)
       return DXGI_ERROR_INVALID_CALL;
-    
+
     *pAdapter = m_dxgiAdapter.ref();
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::GetGPUThreadPriority(
           INT*                  pPriority) {
     *pPriority = 0;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::QueryResourceResidency(
           IUnknown* const*      ppResources,
           DXGI_RESIDENCY*       pResidencyStatus,
-          UINT                  NumResources) {    
+          UINT                  NumResources) {
     if (!ppResources || !pResidencyStatus)
       return E_INVALIDARG;
 
@@ -1225,37 +1226,37 @@ namespace dxvk {
 
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::SetGPUThreadPriority(
           INT                   Priority) {
     if (Priority < -7 || Priority > 7)
       return E_INVALIDARG;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::GetMaximumFrameLatency(
           UINT*                 pMaxLatency) {
     if (!pMaxLatency)
       return DXGI_ERROR_INVALID_CALL;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::SetMaximumFrameLatency(
           UINT                  MaxLatency) {
     if (MaxLatency == 0)
       MaxLatency = 1;
-    
+
     if (MaxLatency > DXGI_MAX_SWAP_CHAIN_BUFFERS)
       return DXGI_ERROR_INVALID_CALL;
 
     return S_OK;
   }
-  
-  
-  HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::OfferResources( 
+
+
+  HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::OfferResources(
           UINT                          NumResources,
           IDXGIResource* const*         ppResources,
           DXGI_OFFER_RESOURCE_PRIORITY  Priority) {
@@ -1263,7 +1264,7 @@ namespace dxvk {
   }
 
 
-  HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::OfferResources1( 
+  HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::OfferResources1(
           UINT                          NumResources,
           IDXGIResource* const*         ppResources,
           DXGI_OFFER_RESOURCE_PRIORITY  Priority,
@@ -1271,8 +1272,8 @@ namespace dxvk {
     return S_OK;
   }
 
-  
-  HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::ReclaimResources( 
+
+  HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::ReclaimResources(
           UINT                          NumResources,
           IDXGIResource* const*         ppResources,
           BOOL*                         pDiscarded) {
@@ -1296,7 +1297,7 @@ namespace dxvk {
 
   HRESULT STDMETHODCALLTYPE D3D11DXGIDevice::EnqueueSetEvent(HANDLE hEvent) {
     log("stub", __func__);
-    return DXGI_ERROR_UNSUPPORTED;           
+    return DXGI_ERROR_UNSUPPORTED;
   }
 
   void STDMETHODCALLTYPE D3D11DXGIDevice::Trim() {

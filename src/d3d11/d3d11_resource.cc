@@ -1,4 +1,5 @@
 #include "d3d11_buffer.h"
+#include "d3d11_include.h"
 #include "d3d11_texture.h"
 #include "d3d11_resource.h"
 
@@ -19,13 +20,13 @@ namespace dxvk {
   ULONG STDMETHODCALLTYPE D3D11DXGIResource::AddRef() {
     return m_resource->AddRef();
   }
-  
+
 
   ULONG STDMETHODCALLTYPE D3D11DXGIResource::Release() {
     return m_resource->Release();
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIResource::QueryInterface(
           REFIID                  riid,
           void**                  ppvObject) {
@@ -40,7 +41,7 @@ namespace dxvk {
     return m_resource->GetPrivateData(Name, pDataSize, pData);
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIResource::SetPrivateData(
           REFGUID                 Name,
           UINT                    DataSize,
@@ -48,21 +49,21 @@ namespace dxvk {
     return m_resource->SetPrivateData(Name, DataSize, pData);
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIResource::SetPrivateDataInterface(
           REFGUID                 Name,
     const IUnknown*               pUnknown) {
     return m_resource->SetPrivateDataInterface(Name, pUnknown);
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIResource::GetParent(
           REFIID                  riid,
           void**                  ppParent) {
     return GetDevice(riid, ppParent);
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11DXGIResource::GetDevice(
           REFIID                  riid,
           void**                  ppDevice) {
@@ -95,7 +96,7 @@ namespace dxvk {
 
     if (FAILED(hr))
       return hr;
-    
+
     DXGI_USAGE usage = desc.DxgiUsage;
 
     switch (desc.Usage) {
@@ -105,13 +106,12 @@ namespace dxvk {
       case D3D11_USAGE_STAGING:   usage |= DXGI_CPU_ACCESS_READ_WRITE; break;
     }
 
-    // TODO add flags for swap chain back buffers
     if (desc.BindFlags & (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_CONSTANT_BUFFER))
       usage |= DXGI_USAGE_SHADER_INPUT;
-    
+
     if (desc.BindFlags & D3D11_BIND_RENDER_TARGET)
       usage |= DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    
+
     if (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS)
       usage |= DXGI_USAGE_UNORDERED_ACCESS;
 
@@ -145,7 +145,7 @@ namespace dxvk {
     log("err", "D3D11DXGIResource::CreateSubresourceSurface: Stub");
     return E_NOTIMPL;
   }
-  
+
 
   HRESULT GetCommonResourceDesc(
           ID3D11Resource*             pResource,
@@ -196,7 +196,7 @@ namespace dxvk {
       default: return E_INVALIDARG;
     }
   }
-  
+
 
   HRESULT ResourceReleasePrivate(ID3D11Resource* pResource) {
     D3D11_RESOURCE_DIMENSION dim;

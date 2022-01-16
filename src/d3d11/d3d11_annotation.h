@@ -14,13 +14,13 @@ namespace dxvk {
     ~D3D11UserDefinedAnnotation();
 
     ULONG STDMETHODCALLTYPE AddRef();
-    
+
     ULONG STDMETHODCALLTYPE Release();
-    
+
     HRESULT STDMETHODCALLTYPE QueryInterface(
             REFIID                  riid,
             void**                  ppvObject);
-    
+
     INT STDMETHODCALLTYPE BeginEvent(
             LPCWSTR                 Name);
 

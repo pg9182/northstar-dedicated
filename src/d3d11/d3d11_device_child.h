@@ -1,8 +1,7 @@
 #pragma once
 
-#include "d3d11_include.h"
-
 #include "com_private_data.h"
+#include "d3d11_include.h"
 
 namespace dxvk {
 
@@ -10,14 +9,14 @@ namespace dxvk {
 
   template<typename Base>
   class D3D11DeviceObject : public Base {
-    
+
   public:
 
     D3D11DeviceObject(D3D11Device* pDevice)
     : m_parent(pDevice) {
 
     }
-    
+
     HRESULT STDMETHODCALLTYPE GetPrivateData(
             REFGUID guid,
             UINT    *pDataSize,
@@ -25,7 +24,7 @@ namespace dxvk {
       return m_privateData.getData(
         guid, pDataSize, pData);
     }
-    
+
     HRESULT STDMETHODCALLTYPE SetPrivateData(
             REFGUID guid,
             UINT    DataSize,
@@ -33,7 +32,7 @@ namespace dxvk {
       return m_privateData.setData(
         guid, DataSize, pData);
     }
-    
+
     HRESULT STDMETHODCALLTYPE SetPrivateDataInterface(
             REFGUID  guid,
       const IUnknown *pUnknown) final {
@@ -55,17 +54,17 @@ namespace dxvk {
     }
 
     D3D11Device* const m_parent;
-    
+
   private:
-    
+
     ComPrivateData m_privateData;
-    
+
   };
 
-  
+
   template<typename Base>
   class D3D11DeviceChild : public D3D11DeviceObject<ComObject<Base>> {
-    
+
   public:
 
     D3D11DeviceChild(D3D11Device* pDevice)
@@ -82,7 +81,7 @@ namespace dxvk {
 
       return refCount + 1;
     }
-    
+
     ULONG STDMETHODCALLTYPE Release() {
       uint32_t refCount = --this->m_refCount;
       if (unlikely(!refCount)) {
@@ -92,12 +91,12 @@ namespace dxvk {
       }
       return refCount;
     }
-    
+
   };
 
   template<typename Base>
   class D3D11StateObject : public D3D11DeviceObject<Base> {
-    
+
   public:
 
     D3D11StateObject(D3D11Device* pDevice)
@@ -112,7 +111,7 @@ namespace dxvk {
 
       return refCount + 1;
     }
-    
+
     ULONG STDMETHODCALLTYPE Release() {
       uint32_t refCount = --this->m_refCount;
       if (unlikely(!refCount))
@@ -124,7 +123,7 @@ namespace dxvk {
   private:
 
     std::atomic<uint32_t> m_refCount = { 0u };
-    
+
   };
-  
+
 }

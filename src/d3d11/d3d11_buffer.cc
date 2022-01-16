@@ -1,9 +1,9 @@
 #include "d3d11_buffer.h"
-#include "d3d11_context.h"
+#include "d3d11_include.h"
 #include "d3d11_device.h"
 
 namespace dxvk {
-  
+
   D3D11Buffer::D3D11Buffer(
           D3D11Device*                pDevice,
     const D3D11_BUFFER_DESC*          pDesc)
@@ -11,18 +11,18 @@ namespace dxvk {
     m_desc        (*pDesc),
     m_resource    (this) {
   }
-  
-  
+
+
   D3D11Buffer::~D3D11Buffer() {
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE D3D11Buffer::QueryInterface(REFIID riid, void** ppvObject) {
     if (ppvObject == nullptr)
       return E_POINTER;
 
     *ppvObject = nullptr;
-    
+
     if (riid == __uuidof(IUnknown)
      || riid == __uuidof(ID3D11DeviceChild)
      || riid == __uuidof(ID3D11Resource)
@@ -38,26 +38,26 @@ namespace dxvk {
        *ppvObject = ref(&m_resource);
        return S_OK;
     }
-    
+
     log("warn", str::format(__func__, " Unknown interface query ", riid));
     return E_NOINTERFACE;
   }
-  
-  
+
+
   UINT STDMETHODCALLTYPE D3D11Buffer::GetEvictionPriority() {
     return DXGI_RESOURCE_PRIORITY_MAXIMUM;
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11Buffer::SetEvictionPriority(UINT EvictionPriority) {
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11Buffer::GetType(D3D11_RESOURCE_DIMENSION* pResourceDimension) {
     *pResourceDimension = D3D11_RESOURCE_DIMENSION_BUFFER;
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11Buffer::GetDesc(D3D11_BUFFER_DESC* pDesc) {
     *pDesc = m_desc;
   }

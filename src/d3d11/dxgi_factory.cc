@@ -1,4 +1,6 @@
+#include "d3d11_include.h"
 #include "d3d11_swapchain.h"
+#include "dxgi_adapter.h"
 #include "dxgi_factory.h"
 
 namespace dxvk {
@@ -6,18 +8,18 @@ namespace dxvk {
   DxgiFactory::DxgiFactory(UINT Flags)
   : m_flags (Flags) {
   }
-  
-  
+
+
   DxgiFactory::~DxgiFactory() {
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::QueryInterface(REFIID riid, void** ppvObject) {
     if (ppvObject == nullptr)
       return E_POINTER;
 
     *ppvObject = nullptr;
-    
+
     if (riid == __uuidof(IUnknown)
      || riid == __uuidof(IDXGIObject)
      || riid == __uuidof(IDXGIFactory)
@@ -31,23 +33,23 @@ namespace dxvk {
       *ppvObject = ref(this);
       return S_OK;
     }
-    
+
     log("warn", str::format(__func__, " Unknown interface query ", riid));
     return E_NOINTERFACE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::GetParent(REFIID riid, void** ppParent) {
     InitReturnPtr(ppParent);
     return E_NOINTERFACE;
   }
-  
-  
+
+
   BOOL STDMETHODCALLTYPE DxgiFactory::IsWindowedStereoEnabled() {
     return FALSE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::CreateSoftwareAdapter(
           HMODULE         Module,
           IDXGIAdapter**  ppAdapter) {
@@ -55,15 +57,15 @@ namespace dxvk {
     log("stub", __func__);
     return DXGI_ERROR_UNSUPPORTED;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::CreateSwapChain(
           IUnknown*             pDevice,
           DXGI_SWAP_CHAIN_DESC* pDesc,
           IDXGISwapChain**      ppSwapChain) {
     if (ppSwapChain == nullptr || pDesc == nullptr || pDevice == nullptr)
       return DXGI_ERROR_INVALID_CALL;
-    
+
     DXGI_SWAP_CHAIN_DESC1 desc;
     desc.Width              = pDesc->BufferDesc.Width;
     desc.Height             = pDesc->BufferDesc.Height;
@@ -76,24 +78,24 @@ namespace dxvk {
     desc.SwapEffect         = pDesc->SwapEffect;
     desc.AlphaMode          = DXGI_ALPHA_MODE_IGNORE;
     desc.Flags              = pDesc->Flags;
-    
+
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC descFs;
     descFs.RefreshRate      = pDesc->BufferDesc.RefreshRate;
     descFs.ScanlineOrdering = pDesc->BufferDesc.ScanlineOrdering;
     descFs.Scaling          = pDesc->BufferDesc.Scaling;
     descFs.Windowed         = pDesc->Windowed;
-    
+
     IDXGISwapChain1* swapChain = nullptr;
     HRESULT hr = CreateSwapChainForHwnd(
       pDevice, pDesc->OutputWindow,
       &desc, &descFs, nullptr,
       &swapChain);
-    
+
     *ppSwapChain = swapChain;
     return hr;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::CreateSwapChainForHwnd(
           IUnknown*             pDevice,
           HWND                  hWnd,
@@ -102,23 +104,23 @@ namespace dxvk {
           IDXGIOutput*          pRestrictToOutput,
           IDXGISwapChain1**     ppSwapChain) {
     InitReturnPtr(ppSwapChain);
-    
+
     if (!ppSwapChain || !pDesc || !hWnd || !pDevice)
       return DXGI_ERROR_INVALID_CALL;
-  
+
     RECT rect = { };
     ::GetClientRect(hWnd, &rect);
 
     DXGI_SWAP_CHAIN_DESC1 desc = *pDesc;
-    
+
     if (desc.Width)
       desc.Width = rect.right - rect.left;
-    
+
     if (desc.Height)
       desc.Height = rect.bottom - rect.top;
 
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc;
-    
+
     if (pFullscreenDesc) {
       fsDesc = *pFullscreenDesc;
     } else {
@@ -127,21 +129,21 @@ namespace dxvk {
       fsDesc.Scaling          = DXGI_MODE_SCALING_UNSPECIFIED;
       fsDesc.Windowed         = TRUE;
     }
-    
+
     HRESULT hr;
     D3D11Device *device;
-    
+
     hr = pDevice->QueryInterface(__uuidof(ID3D11Device), reinterpret_cast<void**>(&device));
 
     if (FAILED(hr))
       return hr;
 
     *ppSwapChain = ref(new D3D11SwapChain(device, this, hWnd, &desc, &fsDesc));
-    
+
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::CreateSwapChainForCoreWindow(
           IUnknown*             pDevice,
           IUnknown*             pWindow,
@@ -152,8 +154,8 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::CreateSwapChainForComposition(
           IUnknown*             pDevice,
     const DXGI_SWAP_CHAIN_DESC1* pDesc,
@@ -163,59 +165,59 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::EnumAdapters(
           UINT            Adapter,
           IDXGIAdapter**  ppAdapter) {
     InitReturnPtr(ppAdapter);
-    
+
     if (ppAdapter == nullptr)
       return DXGI_ERROR_INVALID_CALL;
-    
+
     IDXGIAdapter1* handle = nullptr;
     HRESULT hr = this->EnumAdapters1(Adapter, &handle);
     *ppAdapter = handle;
     return hr;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::EnumAdapters1(
           UINT            Adapter,
           IDXGIAdapter1** ppAdapter) {
     InitReturnPtr(ppAdapter);
-    
+
     if (ppAdapter == nullptr)
       return DXGI_ERROR_INVALID_CALL;
 
     if (Adapter != 0)
       return DXGI_ERROR_NOT_FOUND;
-    
+
     *ppAdapter = ref(new DxgiAdapter(this, Adapter));
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::EnumAdapterByLuid(
           LUID                  AdapterLuid,
           REFIID                riid,
           void**                ppvAdapter) {
     InitReturnPtr(ppvAdapter);
-    
+
     if (ppvAdapter == nullptr)
       return DXGI_ERROR_INVALID_CALL;
 
     return (new DxgiAdapter(this, 0))->QueryInterface(riid, ppvAdapter);
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::EnumAdapterByGpuPreference(
           UINT                  Adapter,
           DXGI_GPU_PREFERENCE   GpuPreference,
           REFIID                riid,
           void**                ppvAdapter) {
     InitReturnPtr(ppvAdapter);
-    
+
     if (ppvAdapter == nullptr)
       return DXGI_ERROR_INVALID_CALL;
 
@@ -227,7 +229,7 @@ namespace dxvk {
           REFIID                riid,
           void**                ppvAdapter) {
     InitReturnPtr(ppvAdapter);
-    
+
     if (ppvAdapter == nullptr)
       return DXGI_ERROR_INVALID_CALL;
 
@@ -240,26 +242,26 @@ namespace dxvk {
       return DXGI_ERROR_INVALID_CALL;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::GetSharedResourceAdapterLuid(
           HANDLE                hResource,
           LUID*                 pLuid) {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::MakeWindowAssociation(HWND WindowHandle, UINT Flags) {
     return S_OK;
   }
-  
-  
+
+
   BOOL STDMETHODCALLTYPE DxgiFactory::IsCurrent() {
     return TRUE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::RegisterOcclusionStatusWindow(
           HWND                  WindowHandle,
           UINT                  wMsg,
@@ -267,16 +269,16 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::RegisterStereoStatusEvent(
           HANDLE                hEvent,
           DWORD*                pdwCookie) {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiFactory::RegisterStereoStatusWindow(
           HWND                  WindowHandle,
           UINT                  wMsg,
@@ -284,7 +286,7 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE DxgiFactory::RegisterOcclusionStatusEvent(
           HANDLE                hEvent,
@@ -292,13 +294,13 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
+
 
   void STDMETHODCALLTYPE DxgiFactory::UnregisterStereoStatus(
           DWORD                 dwCookie) {
   }
-  
-  
+
+
   void STDMETHODCALLTYPE DxgiFactory::UnregisterOcclusionStatus(
           DWORD                 dwCookie) {
   }

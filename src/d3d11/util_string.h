@@ -7,7 +7,7 @@
 #include "com_include.h"
 
 namespace dxvk::str {
-  
+
   std::string fromws(const WCHAR *ws);
 
   void tows(const char* mbs, WCHAR* wcs, size_t wcsLen);
@@ -18,7 +18,7 @@ namespace dxvk::str {
   }
 
   std::wstring tows(const char* mbs);
-  
+
   inline void format1(std::stringstream&) { }
 
   template<typename... Tx>
@@ -32,12 +32,12 @@ namespace dxvk::str {
     str << arg;
     format1(str, args...);
   }
-  
+
   template<typename... Args>
   std::string format(const Args&... args) {
     std::stringstream stream;
     format1(stream, args...);
     return stream.str();
   }
-  
+
 }

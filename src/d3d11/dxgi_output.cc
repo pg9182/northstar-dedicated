@@ -1,27 +1,28 @@
+#include "d3d11_include.h"
 #include "dxgi_adapter.h"
 #include "dxgi_factory.h"
 #include "dxgi_output.h"
 
 namespace dxvk {
-  
+
   DxgiOutput::DxgiOutput(
     const Com<DxgiFactory>& factory,
     const Com<DxgiAdapter>& adapter)
-  : m_adapter(adapter) { 
+  : m_adapter(adapter) {
   }
-  
-  
+
+
   DxgiOutput::~DxgiOutput() {
-    
+
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::QueryInterface(REFIID riid, void** ppvObject) {
     if (ppvObject == nullptr)
       return E_POINTER;
 
     *ppvObject = nullptr;
-    
+
     if (riid == __uuidof(IUnknown)
      || riid == __uuidof(IDXGIObject)
      || riid == __uuidof(IDXGIOutput)
@@ -34,17 +35,17 @@ namespace dxvk {
       *ppvObject = ref(this);
       return S_OK;
     }
-    
+
     log("warn", str::format(__func__, " Unknown interface query ", riid));
     return E_NOINTERFACE;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::GetParent(REFIID riid, void **ppParent) {
     return m_adapter->QueryInterface(riid, ppParent);
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::FindClosestMatchingMode(
     const DXGI_MODE_DESC *pModeToMatch,
           DXGI_MODE_DESC *pClosestMatch,
@@ -55,8 +56,8 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::FindClosestMatchingMode1(
     const DXGI_MODE_DESC1*      pModeToMatch,
           DXGI_MODE_DESC1*      pClosestMatch,
@@ -121,8 +122,8 @@ namespace dxvk {
     *pNumModes = 1;
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::GetDisplayModeList1(
           DXGI_FORMAT           EnumFormat,
           UINT                  Flags,
@@ -140,30 +141,30 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::GetFrameStatistics(DXGI_FRAME_STATISTICS* pStats) {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::GetGammaControl(DXGI_GAMMA_CONTROL* pArray) {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::GetGammaControlCapabilities(DXGI_GAMMA_CONTROL_CAPABILITIES* pGammaCaps) {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   void STDMETHODCALLTYPE DxgiOutput::ReleaseOwnership() {
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::SetDisplaySurface(IDXGISurface* pScanoutSurface) {
     log("stub", __func__);
     return E_NOTIMPL;
@@ -174,25 +175,25 @@ namespace dxvk {
     log("stub", __func__);
     return E_NOTIMPL;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::SetGammaControl(const DXGI_GAMMA_CONTROL* pArray) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::TakeOwnership(
           IUnknown *pDevice,
           BOOL     Exclusive) {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::WaitForVBlank() {
     return S_OK;
   }
-  
-  
+
+
   HRESULT STDMETHODCALLTYPE DxgiOutput::DuplicateOutput(
           IUnknown*                 pDevice,
           IDXGIOutputDuplication**  ppOutputDuplication) {
@@ -237,7 +238,7 @@ namespace dxvk {
           UINT*                 pFlags) {
     return DXGI_ERROR_UNSUPPORTED;
   }
-  
+
 
   HRESULT STDMETHODCALLTYPE DxgiOutput::CheckHardwareCompositionSupport(
           UINT*                 pFlags) {

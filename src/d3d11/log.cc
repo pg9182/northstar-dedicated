@@ -9,7 +9,7 @@
 #include "util_string.h"
 
 static std::mutex log_mutex;
- 
+
 void dxvk::log(const std::string& prefix, const std::string& message) {
   std::lock_guard<std::mutex> lock(log_mutex);
 

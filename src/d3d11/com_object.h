@@ -5,9 +5,9 @@
 #include "com_include.h"
 
 #include "util_likely.h"
-  
+
 namespace dxvk {
-  
+
   template<typename T>
   class NoWrapper : public T {
 
@@ -16,7 +16,7 @@ namespace dxvk {
     virtual ~NoWrapper() { }
 
   };
-  
+
   /**
    * \brief Reference-counted COM object
    *
@@ -25,7 +25,7 @@ namespace dxvk {
    * \c IUnknown, and provides methods to increment and
    * decrement private references which are not visible
    * to the application.
-   * 
+   *
    * Having two reference counters is sadly necessary
    * in order to not break games which steal internal
    * references if the refefence count of an object is
@@ -35,18 +35,18 @@ namespace dxvk {
    */
   template<typename Base>
   class ComObject : public Base {
-    
+
   public:
-    
+
     virtual ~ComObject() { }
-    
+
     ULONG STDMETHODCALLTYPE AddRef() {
       uint32_t refCount = m_refCount++;
       if (unlikely(!refCount))
         AddRefPrivate();
       return refCount + 1;
     }
-    
+
     ULONG STDMETHODCALLTYPE Release() {
       uint32_t refCount = --m_refCount;
       if (unlikely(!refCount))
@@ -71,12 +71,12 @@ namespace dxvk {
     ULONG GetPrivateRefCount() {
       return m_refPrivate.load();
     }
-    
+
   protected:
-    
+
     std::atomic<uint32_t> m_refCount   = { 0ul };
     std::atomic<uint32_t> m_refPrivate = { 0ul };
-    
+
   };
 
   /**
@@ -109,11 +109,11 @@ namespace dxvk {
     }
 
   };
-  
+
   template<typename T>
   inline void InitReturnPtr(T** ptr) {
     if (ptr != nullptr)
       *ptr = nullptr;
   }
-  
+
 }

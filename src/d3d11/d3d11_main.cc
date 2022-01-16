@@ -1,9 +1,10 @@
 #include "d3d11_device.h"
 #include "dxgi_factory.h"
-  
+#include "d3d11_include.h"
+
 extern "C" {
   using namespace dxvk;
-  
+
   DLLEXPORT HRESULT __stdcall D3D11CoreCreateDevice(
           IDXGIFactory*       pFactory,
           IDXGIAdapter*       pAdapter,
@@ -16,7 +17,7 @@ extern "C" {
     D3D_FEATURE_LEVEL defaultFeatureLevels[] = {
       D3D_FEATURE_LEVEL_11_0,
     };
-    
+
     if (pFeatureLevels == nullptr || FeatureLevels == 0) {
       pFeatureLevels = defaultFeatureLevels,
       FeatureLevels  = sizeof(defaultFeatureLevels) / sizeof(*defaultFeatureLevels);
@@ -28,20 +29,20 @@ extern "C" {
       if (pFeatureLevels[flId] == D3D_FEATURE_LEVEL_11_1 || pFeatureLevels[flId] == D3D_FEATURE_LEVEL_11_0)
         break;
     }
-    
+
     if (flId == FeatureLevels) {
       log("err", "D3D11CoreCreateDevice: Requested feature level not supported");
       return E_INVALIDARG;
     }
-    
+
     // Try to create the device with the given parameters.
     const D3D_FEATURE_LEVEL fl = pFeatureLevels[flId];
 
     Com<D3D11DXGIDevice> device = new D3D11DXGIDevice(pAdapter, fl, Flags);
     return device->QueryInterface(__uuidof(ID3D11Device), reinterpret_cast<void**>(ppDevice));
   }
-  
-  
+
+
   static HRESULT D3D11InternalCreateDeviceAndSwapChain(
           IDXGIAdapter*         pAdapter,
           D3D_DRIVER_TYPE       DriverType,
@@ -132,7 +133,7 @@ extern "C" {
 
     return S_OK;
   }
-  
+
 
   DLLEXPORT HRESULT __stdcall D3D11CreateDevice(
           IDXGIAdapter*         pAdapter,
@@ -153,8 +154,8 @@ extern "C" {
       nullptr, nullptr,
       ppDevice, pFeatureLevel, ppImmediateContext);
   }
-  
-  
+
+
   DLLEXPORT HRESULT __stdcall D3D11CreateDeviceAndSwapChain(
           IDXGIAdapter*         pAdapter,
           D3D_DRIVER_TYPE       DriverType,
@@ -174,5 +175,5 @@ extern "C" {
       pSwapChainDesc, ppSwapChain,
       ppDevice, pFeatureLevel, ppImmediateContext);
   }
-  
+
 }

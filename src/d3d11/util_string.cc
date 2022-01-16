@@ -27,7 +27,7 @@ namespace dxvk::str {
   std::wstring tows(const char* mbs) {
     size_t len = ::MultiByteToWideChar(CP_UTF8,
       0, mbs, -1, nullptr, 0);
-    
+
     if (len <= 1)
       return L"";
 

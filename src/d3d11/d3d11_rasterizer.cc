@@ -1,16 +1,17 @@
 #include "d3d11_device.h"
+#include "d3d11_include.h"
 #include "d3d11_rasterizer.h"
 
 namespace dxvk {
-  
+
   D3D11RasterizerState::D3D11RasterizerState(
           D3D11Device*                    device,
     const D3D11_RASTERIZER_DESC2&         desc)
   : D3D11StateObject<ID3D11RasterizerState2>(device),
     m_desc(desc) {
   }
-  
-  
+
+
   D3D11RasterizerState::~D3D11RasterizerState() {
   }
 
@@ -20,7 +21,7 @@ namespace dxvk {
       return E_POINTER;
 
     *ppvObject = nullptr;
-    
+
     if (riid == __uuidof(IUnknown)
      || riid == __uuidof(ID3D11DeviceChild)
      || riid == __uuidof(ID3D11RasterizerState)
@@ -29,12 +30,12 @@ namespace dxvk {
       *ppvObject = ref(this);
       return S_OK;
     }
-    
+
     log("warn", str::format(__func__, " Unknown interface query ", riid));
     return E_NOINTERFACE;
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11RasterizerState::GetDesc(D3D11_RASTERIZER_DESC* pDesc) {
     pDesc->FillMode               = m_desc.FillMode;
     pDesc->CullMode               = m_desc.CullMode;
@@ -47,8 +48,8 @@ namespace dxvk {
     pDesc->MultisampleEnable      = m_desc.MultisampleEnable;
     pDesc->AntialiasedLineEnable  = m_desc.AntialiasedLineEnable;
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11RasterizerState::GetDesc1(D3D11_RASTERIZER_DESC1* pDesc) {
     pDesc->FillMode               = m_desc.FillMode;
     pDesc->CullMode               = m_desc.CullMode;
@@ -62,12 +63,12 @@ namespace dxvk {
     pDesc->AntialiasedLineEnable  = m_desc.AntialiasedLineEnable;
     pDesc->ForcedSampleCount      = m_desc.ForcedSampleCount;
   }
-  
-  
+
+
   void STDMETHODCALLTYPE D3D11RasterizerState::GetDesc2(D3D11_RASTERIZER_DESC2* pDesc) {
     *pDesc = m_desc;
   }
-  
+
   D3D11_RASTERIZER_DESC2 D3D11RasterizerState::PromoteDesc(
     const D3D11_RASTERIZER_DESC*  pSrcDesc) {
     D3D11_RASTERIZER_DESC2 dstDesc;
@@ -85,7 +86,7 @@ namespace dxvk {
     dstDesc.ConservativeRaster    = D3D11_CONSERVATIVE_RASTERIZATION_MODE_OFF;
     return dstDesc;
   }
-  
+
   D3D11_RASTERIZER_DESC2 D3D11RasterizerState::PromoteDesc(
     const D3D11_RASTERIZER_DESC1*  pSrcDesc) {
     D3D11_RASTERIZER_DESC2 dstDesc;
@@ -103,5 +104,5 @@ namespace dxvk {
     dstDesc.ConservativeRaster    = D3D11_CONSERVATIVE_RASTERIZATION_MODE_OFF;
     return dstDesc;
   }
-  
+
 }

@@ -6,12 +6,10 @@ namespace dxvk {
 
   D3D11UserDefinedAnnotation::D3D11UserDefinedAnnotation(D3D11DeviceContext* ctx)
   : m_container(ctx) {
-
   }
 
 
   D3D11UserDefinedAnnotation::~D3D11UserDefinedAnnotation() {
-
   }
 
 
@@ -19,18 +17,18 @@ namespace dxvk {
     return m_container->AddRef();
   }
 
-  
+
   ULONG STDMETHODCALLTYPE D3D11UserDefinedAnnotation::Release() {
     return m_container->Release();
   }
 
-  
+
   HRESULT STDMETHODCALLTYPE D3D11UserDefinedAnnotation::QueryInterface(
           REFIID                  riid,
           void**                  ppvObject) {
     return m_container->QueryInterface(riid, ppvObject);
   }
-  
+
 
   INT STDMETHODCALLTYPE D3D11UserDefinedAnnotation::BeginEvent(
           LPCWSTR                 Name) {
