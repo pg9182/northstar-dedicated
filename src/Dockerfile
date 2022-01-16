@@ -83,4 +83,4 @@ FROM staging
 RUN /usr/libexec/nsdedi __wineprefix__
 EXPOSE 8081/tcp
 EXPOSE 37015/udp
-ENTRYPOINT ["/usr/libexec/nsdedi", "                                                          "]
+ENTRYPOINT ["/usr/libexec/nsdedi", "                                                                                                                        "]
