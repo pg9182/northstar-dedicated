@@ -65,7 +65,7 @@ jobs:
 
       - id: tags
         name: Generate tags
-        run: TAGS_GHA_OUTPUT=tags ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated stable stable-git
+        run: TAGS_GHA_OUTPUT=tags ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated stable-git stable
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1

@@ -20,8 +20,8 @@ for x in $*; do
     case $x in
     "stable")
         tags+=(
-            "${img}:${seg_ever}-tf${seg_tfver}"
             "${img}:${seg_ever}-tf${seg_tfver}-ns${seg_nsver}"
+            "${img}:${seg_ever}-tf${seg_tfver}"
         ) ;;
     "stable-git")
         tags+=(
