@@ -12,6 +12,7 @@ seg_nsver="$(cd src/northstar && . APKBUILD && echo "$pkgver")"
 seg_tfver="$(cd src/northstar && . APKBUILD && echo "$pkgver_tf")"
 seg_git="$(git rev-parse --short HEAD)"
 seg_yymmdd="$(date --utc +%Y%m%d)"
+seg_rfc3339="$(date --utc --rfc-3339=seconds)"
 
 img="$1"; shift
 
@@ -40,6 +41,12 @@ done
 
 printf "%s\n" "${tags[@]}"
 
-if [[ ${GITHUB_ACTIONS-} == "true" && -n ${TAGS_GHA_OUTPUT-} ]]; then
-    echo "::set-output name=${TAGS_GHA_OUTPUT}::$(IFS=","; echo "${tags[*]}")"
+if [[ ${GITHUB_ACTIONS-} == "true" ]]; then
+    echo "::set-output name=tags::$(IFS=","; echo "${tags[*]}")"
+    echo "::set-output name=ever::${seg_ever}"
+    echo "::set-output name=nsver::${seg_nsver}"
+    echo "::set-output name=tfver::${seg_tfver}"
+    echo "::set-output name=git::${seg_git}"
+    echo "::set-output name=yymmdd::${seg_yymmdd}"
+    echo "::set-output name=rfc3339::${seg_rfc3339}"
 fi

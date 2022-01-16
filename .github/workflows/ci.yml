@@ -22,7 +22,7 @@ jobs:
 
       - id: tags
         name: Generate tags
-        run: TAGS_GHA_OUTPUT=tags ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated-dev dev-git
+        run: ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated-dev dev-git
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -43,6 +43,16 @@ jobs:
           tags: ${{steps.tags.outputs.tags}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.created=${{steps.tags.outputs.rfc3339}}
+            org.opencontainers.image.authors=discord:pg9182#8484
+            org.opencontainers.image.url=https://github.com/${{github.repository}}
+            org.opencontainers.image.documentation=https://github.com/${{github.repository}}
+            org.opencontainers.image.source=https://github.com/${{github.repository}}
+            org.opencontainers.image.revision=${{github.sha}}
+            org.opencontainers.image.vendor=${{github.repository_owner}}
+            org.opencontainers.image.licenses=Zlib AND MIT
+            org.opencontainers.image.description=northstar-dedicated v${{steps.tags.outputs.ever}} @ ${{steps.tags.outputs.git}} (Titanfall v${{steps.tags.outputs.tfver}} / Northstar v${{steps.tags.outputs.nsver}})
 
   server-docker-release:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/stable-')
@@ -65,7 +75,7 @@ jobs:
 
       - id: tags
         name: Generate tags
-        run: TAGS_GHA_OUTPUT=tags ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated stable-git stable
+        run: ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated stable-git stable
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
