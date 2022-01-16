@@ -39,7 +39,22 @@ func main() {
 		break
 	}
 
-	fmt.Println("Northstar Dedicated Server - Docker")
+	hostname, err := os.Hostname()
+	if err != nil {
+		if v := os.Getenv("HOSTNAME"); v != "" {
+			hostname = v
+		} else {
+			fmt.Fprintf(os.Stderr, "Warning: Couldn't get container hostname: %v.\n", err)
+		}
+	}
+	if hostname == "" {
+		hostname = "unknown"
+	}
+	for _, v := range []string{"NS_SERVER_NAME", "NS_SERVER_DESC"} {
+		os.Setenv(v, strings.ReplaceAll(os.Getenv(v), "{{hostname}}", hostname))
+	}
+
+	fmt.Println("Northstar Dedicated Server - Docker (hostname: " + hostname + ")")
 	fmt.Println()
 	fmt.Println("    https://northstar.tf")
 	fmt.Println("    https://northstar.tf/discord")
