@@ -53,6 +53,10 @@ jobs:
             org.opencontainers.image.vendor=${{github.repository_owner}}
             org.opencontainers.image.licenses=Zlib AND MIT
             org.opencontainers.image.description=northstar-dedicated v${{steps.tags.outputs.ever}} @ ${{steps.tags.outputs.git}} (Titanfall v${{steps.tags.outputs.tfver}} / Northstar v${{steps.tags.outputs.nsver}})
+            io.github.pg9182.northstar-dedicated.northstar.version=${{steps.tags.outputs.nsver}}
+            io.github.pg9182.northstar-dedicated.titanfall.version=${{steps.tags.outputs.tfver}}
+            io.github.pg9182.northstar-dedicated.entrypoint.compat=${{steps.tags.outputs.ever}}
+            io.github.pg9182.northstar-dedicated.entrypoint.version=${{github.sha}}
 
   server-docker-release:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/stable-')
