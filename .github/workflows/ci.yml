@@ -1,0 +1,84 @@
+name: ci
+
+on:
+  push:
+    paths:
+      - ".github/workflows/ci.yml"
+      - src/**
+      - scripts/mktag.sh
+
+jobs:
+  server-docker:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+    outputs:
+      image: ghcr.io/${{github.repository_owner}}/northstar-dedicated-dev@${{steps.build.outputs.digest}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - id: tags
+        name: Generate tags
+        run: TAGS_GHA_OUTPUT=tags ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated-dev dev-git
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - id: build
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: src
+          push: true
+          tags: ${{steps.tags.outputs.tags}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  server-docker-release:
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/stable-')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+    environment: 
+      name: server-docker
+      url: https://ghcr.io/${{github.repository_owner}}/northstar-dedicated
+    concurrency:
+      group: server-docker-stable
+      cancel-in-progress: true
+    needs:
+      - server-docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - id: tags
+        name: Generate tags
+        run: TAGS_GHA_OUTPUT=tags ./scripts/mktag.sh ghcr.io/${{github.repository_owner}}/northstar-dedicated stable stable-git
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Pull Docker image
+        run: docker pull ${{needs.server-docker.outputs.image}}
+      
+      - name: Tag Docker image
+        run: for tag in $(echo "${{steps.tags.outputs.tags}}" | tr "," " "); do docker tag ${{needs.server-docker.outputs.image}} ${tag}; done
+
+      - name: Push Docker image
+        run: for tag in $(echo "${{steps.tags.outputs.tags}}" | tr "," " "); do docker push ${tag}; done
