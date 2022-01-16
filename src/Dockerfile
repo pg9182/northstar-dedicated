@@ -82,7 +82,11 @@ RUN adduser -D northstar && \
 USER northstar
 
 FROM staging
-RUN /usr/libexec/nsdedi __wineprefix__
+RUN /usr/libexec/nsdedi __wineprefix__ && \
+    for x in /home/northstar/.wine/drive_c/windows/system32/*; do \
+        orig="/usr/lib/wine/x86_64-windows/$(basename "$x")"; \
+        if [ -f "$orig" ]; then ln -sf "$orig" "$x"; fi; \
+    done
 EXPOSE 8081/tcp
 EXPOSE 37015/udp
 ENTRYPOINT ["/usr/libexec/nsdedi", "                                                                                                                        "]
