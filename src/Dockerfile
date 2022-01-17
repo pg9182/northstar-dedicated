@@ -32,7 +32,7 @@ FROM build AS build-entrypoint
 COPY --chown=nsbuild:nsbuild ./entrypoint/ /nsbuild/src/main/entrypoint/
 RUN cd /nsbuild/src/main/entrypoint && abuild -r
 
-FROM base AS pkgstaging
+FROM base
 RUN apk add --no-cache gnutls tzdata ca-certificates sudo
 RUN --mount=from=build,source=/etc/apk/keys,target=/etc/apk/keys \
     --mount=from=build-wine,source=/nsbuild/packages/main/x86_64,target=/nsbuild/wine \
@@ -52,9 +52,25 @@ RUN adduser -D northstar && \
 USER northstar
 
 RUN /usr/libexec/nsdedi __wineprefix__ && \
-    for x in /home/northstar/.wine/drive_c/windows/system32/*; do \
+    for x in \
+        /home/northstar/.wine/drive_c/"Program Files"/"Common Files"/System/*/* \
+        /home/northstar/.wine/drive_c/windows/* \
+        /home/northstar/.wine/drive_c/windows/system32/* \
+        /home/northstar/.wine/drive_c/windows/system32/drivers/* \
+        /home/northstar/.wine/drive_c/windows/system32/wbem/* \
+        /home/northstar/.wine/drive_c/windows/system32/spool/drivers/x64/*/* \
+        /home/northstar/.wine/drive_c/windows/system32/Speech/common/* \
+        /home/northstar/.wine/drive_c/windows/winsxs/*/* \
+    ; do \
         orig="/usr/lib/wine/x86_64-windows/$(basename "$x")"; \
-        if [ -f "$orig" ]; then ln -sf "$orig" "$x"; fi; \
+        if cmp -s "$orig" "$x"; then ln -sf "$orig" "$x"; fi; \
+    done && \
+    for x in \
+        /home/northstar/.wine/drive_c/windows/globalization/sorting/*.nls \
+        /home/northstar/.wine/drive_c/windows/system32/*.nls \
+    ; do \
+        orig="/usr/share/wine/nls/$(basename "$x")"; \
+        if cmp -s "$orig" "$x"; then ln -sf "$orig" "$x"; fi; \
     done
 EXPOSE 8081/tcp
 EXPOSE 37015/udp
