@@ -22,6 +22,7 @@ options="textrels !check"
 source="https://dl.winehq.org/wine/source/6.x/wine-$pkgver.tar.xz
 	rpath.patch
 	winemenubuilder.patch
+	ws2siobacklogquery.patch
 	"
 #	createwindow.patch
 
@@ -282,5 +283,6 @@ sha512sums="
 3e459b305f472ece00cbf467e14e6cfa7422381cb9242d05e9624487d559f438039aa8c780986469591c9d0f05e384380133dc6fb4ed694355ae42744a78d9b7  wine-6.23.tar.xz
 d42a367d30b93fe36b8d6418d53f3c931debef2e9b77bc73e22fff04f5f0d7b9e6622beb78592c814beb32ca214fb7e9c019c652fb2612c61358ba162a520b9d  rpath.patch
 eaaa991510d6de7f33ea8d81954737ab4a18f40675f3fa5822367fe40e439880246209d913f646e80e1120d59fcedaf97d069cf1b203c0d7d032bc8b07faa29d  winemenubuilder.patch
+7bec960a777939fee9503859b110d3c89aab944b2b084c543299e632d036599556f48c2b98c6d630df660758c8a0a68e3ddca28e8565cd279a8642e9a2f25a75  ws2siobacklogquery.patch
 "
 #22621c5096adaa8dcc62cd246a4ec2547b4673e8d5a12cc7ad67cb03804804f24d9d0e6d8d40780f1f42c1219e63e13d0bb8f3e165a73fab05fdb1832e8c91fa  createwindow.patch
