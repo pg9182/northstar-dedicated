@@ -1,14 +1,3 @@
-From 696821155a8fa271ee8a17016ac60f362cdb0713 Mon Sep 17 00:00:00 2001
-From: pg9182 <96569817+pg9182@users.noreply.github.com>
-Date: Wed, 29 Dec 2021 12:24:07 -0500
-Subject: [PATCH] user32: Always return success for CreateWindow / ShowWindow
- on nulldrv
-
-Combined with my d3d11 stub, this allows Northstar to start without X.
----
- dlls/user32/driver.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
-
 diff --git a/dlls/user32/driver.c b/dlls/user32/driver.c
 index 73f4ee67257..f914333b534 100644
 --- a/dlls/user32/driver.c
@@ -40,6 +29,3 @@ index 73f4ee67257..f914333b534 100644
  }
  
  static LRESULT CDECL nulldrv_SysCommand( HWND hwnd, WPARAM wparam, LPARAM lparam )
--- 
-2.33.1
-

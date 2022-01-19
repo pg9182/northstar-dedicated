@@ -1,6 +1,6 @@
 # Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
 pkgname=northstar-dedicated-wine
-pkgver=6.23
+pkgver=7.0
 pkgrel=0
 pkgdesc="Patched Wine build for the Northstar dedicated server"
 
@@ -19,7 +19,7 @@ makedepends="autoconf automake bison flex gnutls-dev libxi-dev mingw-w64-gcc min
 # window handle in-between ticks). This will need more debugging later.
 
 options="textrels !check"
-source="https://dl.winehq.org/wine/source/6.x/wine-$pkgver.tar.xz
+source="https://dl.winehq.org/wine/source/7.0/wine-$pkgver.tar.xz
 	rpath.patch
 	winemenubuilder.patch
 	ws2siobacklogquery.patch
@@ -86,18 +86,25 @@ build() {
 		--without-xxf86vm \
 		$_win64 \
 		\
-		--disable-tests --disable-winemenubuilder --disable-wordpad --disable-wmplayer --disable-iexplore --disable-powershell --disable-control --disable-wusa --disable-uninstaller --disable-wuauserv \
+		--disable-tests --disable-notepad --disable-msxml --disable-msxml2 --disable-msxml3 --disable-msxml4 \
+		--disable-msxml5 --disable-msxml6 --disable-msado15 --disable-msadp32 --disable-msdaps --disable-msdasql \
+		--disable-quartz --disable-sapi --disable-scsiport --disable-usbd --disable-wineps_drv --disable-winspool_drv \
+		--disable-mp3dmod --disable-l3codeca --disable-winedbg \
+		\
+		--without-xml --without-xslt \
+		--disable-xml2 --disable-xslt \
 		\
 		--disable-arp --disable-aspnet_regiis --disable-attrib --disable-cabarc --disable-cacls --disable-chcp_com --disable-clock --disable-control \
 		--disable-cscript --disable-dism --disable-dplaysvr --disable-dpnsvr --disable-dpvsetup --disable-dxdiag --disable-eject --disable-expand \
 		--disable-extrac32 --disable-fc --disable-find --disable-findstr --disable-fsutil --disable-hostname --disable-icacls --disable-icinfo \
-		--disable-ipconfig --disable-lodctr --disable-mshta --disable-msidb --disable-msiexec --disable-msinfo32 --disable-net --disable-netsh \
-		--disable-netstat --disable-ngen --disable-oleview --disable-ping --disable-presentationfontcache --disable-progman --disable-robocopy --disable-sc \
-		--disable-schtasks --disable-sdbinst --disable-secedit --disable-servicemodelreg --disable-shutdown --disable-spoolsv --disable-subst \
-		--disable-systeminfo --disable-taskmgr --disable-termsv --disable-uninstaller --disable-unlodctr --disable-view --disable-wevtutil --disable-where \
-		--disable-whoami --disable-winebrowser --disable-wineconsole --disable-winefile --disable-winemine --disable-winemsibuilder --disable-winetest \
-		--disable-winhlp32 --disable-winmgmt --disable-winver --disable-write --disable-wscript --disable-wuauserv --disable-wusa --disable-xcopy \
-		--disable-acledit --disable-aclui --disable-adsldp --disable-adsldpc --disable-amsi --disable-amstream --disable-api_ms_win_appmodel_identity_l1_1_0 \
+		--disable-iexplore --disable-ipconfig --disable-lodctr --disable-mshta --disable-msidb --disable-msiexec --disable-msinfo32 --disable-net \
+		--disable-netsh --disable-netstat --disable-ngen --disable-oleview --disable-ping --disable-powershell --disable-presentationfontcache \
+		--disable-progman --disable-robocopy --disable-sc --disable-schtasks --disable-sdbinst --disable-secedit --disable-servicemodelreg --disable-shutdown \
+		--disable-spoolsv --disable-subst --disable-systeminfo --disable-taskmgr --disable-termsv --disable-uninstaller --disable-unlodctr --disable-view \
+		--disable-wevtutil --disable-where --disable-whoami --disable-winebrowser --disable-wineconsole --disable-winefile --disable-winemenubuilder \
+		--disable-winemine --disable-winemsibuilder --disable-winetest --disable-winhlp32 --disable-winmgmt --disable-winver --disable-wmplayer \
+		--disable-wordpad --disable-write --disable-wscript --disable-wuauserv --disable-wusa --disable-xcopy --disable-acledit --disable-aclui \
+		--disable-adsldp --disable-adsldpc --disable-amsi --disable-amstream --disable-api_ms_win_appmodel_identity_l1_1_0 \
 		--disable-api_ms_win_appmodel_runtime_l1_1_0 --disable-api_ms_win_appmodel_runtime_l1_1_1 --disable-api_ms_win_appmodel_runtime_l1_1_2 \
 		--disable-api_ms_win_crt_conio_l1_1_0 --disable-api_ms_win_crt_multibyte_l1_1_0 --disable-api_ms_win_crt_private_l1_1_0 \
 		--disable-api_ms_win_crt_process_l1_1_0 --disable-api_ms_win_devices_config_l1_1_0 --disable-api_ms_win_devices_config_l1_1_1 \
@@ -161,63 +168,71 @@ build() {
 		--disable-ext_ms_win_security_cryptui_l1_1_0 --disable-ext_ms_win_shell_comctl32_init_l1_1_0 --disable-ext_ms_win_shell_comdlg32_l1_1_0 \
 		--disable-ext_ms_win_shell_shell32_l1_2_0 --disable-ext_ms_win_uxtheme_themes_l1_1_0 --disable-faultrep --disable-feclient --disable-fltlib \
 		--disable-fntcache --disable-fontsub --disable-fusion --disable-fwpuclnt --disable-gameux --disable-gamingtcui --disable-gdiplus --disable-glu32 \
-		--disable-gphoto2_ds --disable-gpkcsp --disable-hal --disable-hlink --disable-hnetcfg --disable-iccvid --disable-icmp --disable-ieproxy \
-		--disable-imagehlp --disable-inetcomm --disable-inetcpl_cpl --disable-inetmib1 --disable-infosoft --disable-initpki --disable-inkobj --disable-inseng \
-		--disable-iprop --disable-irprops_cpl --disable-itircl --disable-itss --disable-joy_cpl --disable-jscript --disable-jsproxy --disable-ksproxy_ax \
-		--disable-ksuser --disable-ktmw32 --disable-loadperf --disable-localspl --disable-localui --disable-lz32 --disable-mapi32 --disable-mapistub \
-		--disable-mciavi32 --disable-mcicda --disable-mciqtz32 --disable-mciseq --disable-mciwave --disable-mf --disable-mf3216 --disable-mferror \
-		--disable-mfmediaengine --disable-mfplat --disable-mfplay --disable-mfreadwrite --disable-mgmtapi --disable-midimap --disable-mmcndmgr \
-		--disable-msasn1 --disable-mscat32 --disable-mscms --disable-mscoree --disable-mscorwks --disable-msctf --disable-msctfmonitor --disable-msctfp \
-		--disable-msdelta --disable-msdrm --disable-msftedit --disable-mshtml --disable-mshtml_tlb --disable-msi --disable-msident --disable-msimg32 \
-		--disable-msimsg --disable-msimtf --disable-msisys_ocx --disable-msls31 --disable-msnet32 --disable-mspatcha --disable-msports --disable-msrle32 \
-		--disable-msscript_ocx --disable-mssign32 --disable-mssip32 --disable-mstask --disable-msvcirt --disable-msvcm80 --disable-msvcm90 --disable-msvcp100 \
-		--disable-msvcp120 --disable-msvcp120_app --disable-msvcp60 --disable-msvcp70 --disable-msvcp71 --disable-msvcp80 --disable-msvcp90 \
-		--disable-msvcp_win --disable-msvcr100 --disable-msvcr120 --disable-msvcr120_app --disable-msvcr70 --disable-msvcr71 --disable-msvcr80 \
-		--disable-msvcr90 --disable-msvidc32 --disable-mswsock --disable-mtxdm --disable-ncrypt --disable-nddeapi --disable-netcfgx --disable-netprofm \
-		--disable-netutils --disable-ninput --disable-npmshtml --disable-npptools --disable-ntdsapi --disable-ntprint --disable-objsel --disable-odbc32 \
-		--disable-odbcbcp --disable-odbccp32 --disable-odbccu32 --disable-oleacc --disable-olecli32 --disable-oledlg --disable-olepro32 --disable-olesvr32 \
-		--disable-olethk32 --disable-opcservices --disable-openal32 --disable-opencl --disable-packager --disable-pdh --disable-photometadatahandler \
-		--disable-pidgen --disable-powrprof --disable-printui --disable-prntvpt --disable-pstorec --disable-pwrshplugin --disable-qasf --disable-qdvd \
-		--disable-qmgr --disable-qmgrprxy --disable-query --disable-qwave --disable-rasapi32 --disable-rasdlg --disable-resutils --disable-riched20 \
-		--disable-riched32 --disable-rsabase --disable-rstrtmgr --disable-rtutils --disable-rtworkq --disable-samlib --disable-sane_ds --disable-sas \
-		--disable-scarddlg --disable-sccbase --disable-schedsvc --disable-scrobj --disable-scrrun --disable-security --disable-sensapi --disable-serialui \
-		--disable-sfc --disable-sfc_os --disable-shdoclc --disable-shfolder --disable-slbcsp --disable-slc --disable-snmpapi --disable-softpub \
-		--disable-spoolss --disable-sppc --disable-srclient --disable-srvcli --disable-sspicli --disable-stdole2_tlb --disable-stdole32_tlb --disable-sti \
-		--disable-strmdll --disable-svrapi --disable-sxs --disable-t2embed --disable-tapi32 --disable-taskschd --disable-tbs --disable-tdh --disable-traffic \
-		--disable-twain_32 --disable-uianimation --disable-uiautomationcore --disable-uiribbon --disable-unicows --disable-updspapi --disable-url \
-		--disable-usp10 --disable-utildll --disable-vbscript --disable-vcomp --disable-vcomp100 --disable-vcomp110 --disable-vcomp120 --disable-vcomp140 \
-		--disable-vcomp90 --disable-vdmdbg --disable-vga --disable-virtdisk --disable-vssapi --disable-vulkan_1 --disable-wdscore --disable-webservices \
-		--disable-websocket --disable-wer --disable-wevtapi --disable-wiaservc --disable-wimgapi --disable-winealsa_drv --disable-wineandroid_drv \
-		--disable-winecoreaudio_drv --disable-wined3d --disable-winegstreamer --disable-winejoystick_drv --disable-winemac_drv --disable-winemapi \
-		--disable-wineoss_drv --disable-winepulse_drv --disable-wineusb_sys --disable-wing32 --disable-winhttp --disable-winnls32 --disable-winscard \
-		--disable-winsta --disable-wintab32 --disable-winusb --disable-wlanapi --disable-wlanui --disable-wmasf --disable-wmi --disable-wmp --disable-wmphoto \
-		--disable-wmvcore --disable-wnaspi32 --disable-wow64 --disable-wow64cpu --disable-wow64win --disable-wpc --disable-wpcap --disable-wsdapi \
-		--disable-wshom_ocx --disable-wsnmp32 --disable-wtsapi32 --disable-wuapi --disable-wuaueng --disable-x3daudio1_0 --disable-x3daudio1_1 \
-		--disable-x3daudio1_2 --disable-x3daudio1_3 --disable-x3daudio1_4 --disable-x3daudio1_5 --disable-x3daudio1_6 --disable-x3daudio1_7 \
-		--disable-xactengine2_0 --disable-xactengine2_4 --disable-xactengine2_7 --disable-xactengine2_9 --disable-xactengine3_0 --disable-xactengine3_1 \
-		--disable-xactengine3_2 --disable-xactengine3_3 --disable-xactengine3_4 --disable-xactengine3_5 --disable-xactengine3_6 --disable-xactengine3_7 \
-		--disable-xapofx1_1 --disable-xapofx1_2 --disable-xapofx1_3 --disable-xapofx1_4 --disable-xapofx1_5 --disable-xaudio2_0 --disable-xaudio2_1 \
-		--disable-xaudio2_2 --disable-xaudio2_3 --disable-xaudio2_4 --disable-xaudio2_5 --disable-xaudio2_6 --disable-xaudio2_7 --disable-xaudio2_8 \
-		--disable-xaudio2_9 --disable-xinput1_1 --disable-xinput1_2 --disable-xinput1_4 --disable-xinput9_1_0 --disable-xmllite --disable-xolehlp \
-		--disable-xpsprint --disable-xpssvcs
+		--disable-gphoto2_ds --disable-gpkcsp --disable-hal --disable-hlink --disable-hnetcfg --disable-iccvid --disable-icmp --disable-ieframe \
+		--disable-ieproxy --disable-imagehlp --disable-inetcomm --disable-inetcpl_cpl --disable-inetmib1 --disable-infosoft --disable-initpki \
+		--disable-inkobj --disable-inseng --disable-iprop --disable-irprops_cpl --disable-itircl --disable-itss --disable-joy_cpl --disable-jscript \
+		--disable-jsproxy --disable-ksproxy_ax --disable-ksuser --disable-ktmw32 --disable-loadperf --disable-localspl --disable-localui --disable-lz32 \
+		--disable-mapi32 --disable-mapistub --disable-mciavi32 --disable-mcicda --disable-mciqtz32 --disable-mciseq --disable-mciwave --disable-mf \
+		--disable-mf3216 --disable-mferror --disable-mfmediaengine --disable-mfplat --disable-mfplay --disable-mfreadwrite --disable-mgmtapi \
+		--disable-midimap --disable-mmcndmgr --disable-msasn1 --disable-mscat32 --disable-mscms --disable-mscoree --disable-mscorwks --disable-msctf \
+		--disable-msctfmonitor --disable-msctfp --disable-msdelta --disable-msdrm --disable-msftedit --disable-mshtml --disable-mshtml_tlb --disable-msi \
+		--disable-msident --disable-msimg32 --disable-msimsg --disable-msimtf --disable-msisys_ocx --disable-msls31 --disable-msnet32 --disable-mspatcha \
+		--disable-msports --disable-msrle32 --disable-msscript_ocx --disable-mssign32 --disable-mssip32 --disable-mstask --disable-msvcirt --disable-msvcm80 \
+		--disable-msvcm90 --disable-msvcp100 --disable-msvcp120 --disable-msvcp120_app --disable-msvcp60 --disable-msvcp70 --disable-msvcp71 \
+		--disable-msvcp80 --disable-msvcp90 --disable-msvcp_win --disable-msvcr100 --disable-msvcr120 --disable-msvcr120_app --disable-msvcr70 \
+		--disable-msvcr71 --disable-msvcr80 --disable-msvcr90 --disable-msvidc32 --disable-mswsock --disable-mtxdm --disable-ncrypt --disable-nddeapi \
+		--disable-netcfgx --disable-netprofm --disable-netutils --disable-ninput --disable-npmshtml --disable-npptools --disable-ntdsapi --disable-ntprint \
+		--disable-objsel --disable-odbc32 --disable-odbcbcp --disable-odbccp32 --disable-odbccu32 --disable-oleacc --disable-olecli32 --disable-oledlg \
+		--disable-olepro32 --disable-olesvr32 --disable-olethk32 --disable-opcservices --disable-openal32 --disable-opencl --disable-packager --disable-pdh \
+		--disable-photometadatahandler --disable-pidgen --disable-powrprof --disable-printui --disable-prntvpt --disable-pstorec --disable-pwrshplugin \
+		--disable-qasf --disable-qdvd --disable-qmgr --disable-qmgrprxy --disable-query --disable-qwave --disable-rasapi32 --disable-rasdlg \
+		--disable-resutils --disable-riched20 --disable-riched32 --disable-rsabase --disable-rstrtmgr --disable-rtutils --disable-rtworkq --disable-samlib \
+		--disable-sane_ds --disable-sas --disable-scarddlg --disable-sccbase --disable-schedsvc --disable-scrobj --disable-scrrun --disable-security \
+		--disable-sensapi --disable-serialui --disable-sfc --disable-sfc_os --disable-shdoclc --disable-shfolder --disable-slbcsp --disable-slc \
+		--disable-snmpapi --disable-softpub --disable-spoolss --disable-sppc --disable-srclient --disable-srvcli --disable-sspicli --disable-stdole2_tlb \
+		--disable-stdole32_tlb --disable-sti --disable-strmdll --disable-svrapi --disable-sxs --disable-t2embed --disable-tapi32 --disable-taskschd \
+		--disable-tbs --disable-tdh --disable-traffic --disable-twain_32 --disable-uianimation --disable-uiautomationcore --disable-uiribbon \
+		--disable-unicows --disable-updspapi --disable-url --disable-usp10 --disable-utildll --disable-vbscript --disable-vcomp --disable-vcomp100 \
+		--disable-vcomp110 --disable-vcomp120 --disable-vcomp140 --disable-vcomp90 --disable-vdmdbg --disable-vga --disable-virtdisk --disable-vssapi \
+		--disable-vulkan_1 --disable-wdscore --disable-webservices --disable-websocket --disable-wer --disable-wevtapi --disable-wiaservc --disable-wimgapi \
+		--disable-winealsa_drv --disable-wineandroid_drv --disable-winecoreaudio_drv --disable-wined3d --disable-winegstreamer --disable-winemac_drv \
+		--disable-winemapi --disable-wineoss_drv --disable-winepulse_drv --disable-wineusb_sys --disable-wing32 --disable-winhttp --disable-winnls32 \
+		--disable-winscard --disable-winsta --disable-wintab32 --disable-winusb --disable-wlanapi --disable-wlanui --disable-wmasf --disable-wmi \
+		--disable-wmp --disable-wmphoto --disable-wmvcore --disable-wnaspi32 --disable-wow64 --disable-wow64cpu --disable-wow64win --disable-wpc \
+		--disable-wpcap --disable-wsdapi --disable-wshom_ocx --disable-wsnmp32 --disable-wtsapi32 --disable-wuapi --disable-wuaueng --disable-x3daudio1_0 \
+		--disable-x3daudio1_1 --disable-x3daudio1_2 --disable-x3daudio1_3 --disable-x3daudio1_4 --disable-x3daudio1_5 --disable-x3daudio1_6 \
+		--disable-x3daudio1_7 --disable-xactengine2_0 --disable-xactengine2_4 --disable-xactengine2_7 --disable-xactengine2_9 --disable-xactengine3_0 \
+		--disable-xactengine3_1 --disable-xactengine3_2 --disable-xactengine3_3 --disable-xactengine3_4 --disable-xactengine3_5 --disable-xactengine3_6 \
+		--disable-xactengine3_7 --disable-xapofx1_1 --disable-xapofx1_2 --disable-xapofx1_3 --disable-xapofx1_4 --disable-xapofx1_5 --disable-xaudio2_0 \
+		--disable-xaudio2_1 --disable-xaudio2_2 --disable-xaudio2_3 --disable-xaudio2_4 --disable-xaudio2_5 --disable-xaudio2_6 --disable-xaudio2_7 \
+		--disable-xaudio2_8 --disable-xaudio2_9 --disable-xinput1_1 --disable-xinput1_2 --disable-xinput1_4 --disable-xinput9_1_0 --disable-xmllite \
+		--disable-xolehlp --disable-xpsprint --disable-xpssvcs
 		#
-		# ctr="$(docker run --detach --tty --rm ... --entrypoint /bin/ash ghcr.io/pg9182/northstar-dedicated:1.20220116.gite7a0ed9-tf2.0.11.0-ns1.4.0)"
-		# docker exec "$ctr" sudo apk add inotify-tools
-		# docker exec "$ctr" ns rm -rf /home/northstar/.wine
-		# docker exec "$ctr" ns inotifywait -mr /usr/lib/wine/ > inotify.wineprefix.log &
-		# docker exec "$ctr" ns /usr/libexec/nsdedi __wineprefix__
-		# docker exec "$ctr" ns killall inotifywait
-		# docker exec "$ctr" ns inotifywait -mr /usr/lib/wine/ > inotify.nsdedi.log &
-		# docker exec "$ctr" ns /usr/libexec/nsdedi "    " # ctrl-c it after it finishes loading and registering to the master server
-		# docker exec "$ctr" ns killall inotifywait
-		# docker kill "$ctr"
+		## note: first iteration was done with ghcr.io/pg9182/northstar-dedicated:1.20220116.gite7a0ed9-tf2.0.11.0-ns1.4.0 (i.e. a mostly vanilla wine 6.23 build)
+		## libs_wineprefix=activeds advapi32 advpack atl100 avicap32 bcrypt cng combase comctl32 comdlg32 conhost crypt32 cryptdlg cryptnet cryptui devenum dnsapi dsound explorer fltmgr gdi32 hh hidclass hidparse http ieframe iexplore imaadp32 imm32 iphlpapi kernel32 kernelbase ksecdd l3codeca light mlang mofcomp mountmgr mp3dmod mpr msacm32 msado15 msadp32 msdaps msdasql msdmo msg711 msgsm32 msisip msvcrt msvfw32 msxml msxml2 msxml3 msxml4 msxml6 ndis netio newdev notepad nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 oledb32 powershell propsys qcap qedit quartz reg regedit rpcrt4 rsaenh rundll32 sapi scsiport sechost services setupapi shcore shdocvw shell32 shlwapi start tdi tzres ucrtbase urlmon usbd user32 userenv uxtheme version wbemdisp wbemprox win32u windows windowscodecs wineboot winebus winedevice winehid winemenubuilder wineps winevulkan winex11 winexinput wininet winmm winspool wintrust wmic wmiutils wmplayer wordpad ws2_32
+		## libs_nsdedi=actxprxy advapi32 api-ms-win-crt-convert-l1-1-0 api-ms-win-crt-environment-l1-1-0 api-ms-win-crt-filesystem-l1-1-0 api-ms-win-crt-heap-l1-1-0 api-ms-win-crt-locale-l1-1-0 api-ms-win-crt-math-l1-1-0 api-ms-win-crt-runtime-l1-1-0 api-ms-win-crt-stdio-l1-1-0 api-ms-win-crt-string-l1-1-0 api-ms-win-crt-time-l1-1-0 api-ms-win-crt-utility-l1-1-0 avifil32 bcrypt combase comctl32 concrt140 conhost crypt32 dbghelp dnsapi dsound explorer gdi32 hid hidclass hidparse imm32 iphlpapi kerberos kernel32 kernelbase mmdevapi mountmgr msacm32 msv1_0 msvcp110 msvcp140 msvcr110 msvcrt msvfw32 ndis netapi32 normaliz nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 opengl32 plugplay propsys psapi rpcrt4 rpcss rsaenh schannel sechost secur32 services setupapi shcore shell32 shlwapi svchost tzres ucrtbase user32 userenv uxtheme vcruntime140 vcruntime140_1 version wevtsvc win32u windowscodecs wineboot winebus winedevice winehid winemenubuilder winex11 winmm wldap32 ws2_32 wsock32 xinput1_3
 		## https://gist.github.com/pg9182/f4d66fe9fb1b0fa3f1c0a903268979f4
+		## the additional disables were mostly based on removing obviously unused programs
+		#
+		## current iteration is on ghcr.io/pg9182/northstar-dedicated:1.20220117.git5ce2886-tf2.0.11.0-ns1.4.0 (which has the reduced libs based on the stuff above; see the commits after that one)
+		## libs_wineprefix=activeds advapi32 advpack atl100 avicap32 bcrypt cng combase comctl32 comdlg32 crypt32 cryptdlg cryptnet cryptui devenum dnsapi dsound explorer fltmgr gdi32 hh hidclass hidparse http imaadp32 imm32 iphlpapi kernel32 kernelbase ksecdd l3codeca light mlang mofcomp mountmgr mp3dmod mpr msacm32 msado15 msadp32 msdaps msdasql msdmo msg711 msgsm32 msisip msvcrt msvfw32 msxml msxml2 msxml3 msxml4 msxml6 ndis netio newdev notepad nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 oledb32 propsys qcap qedit quartz reg regedit rpcrt4 rsaenh rundll32 sapi scsiport sechost services setupapi shcore shdocvw shell32 shlwapi start tdi tzres ucrtbase urlmon usbd user32 userenv uxtheme version wbemdisp wbemprox win32u windows windowscodecs wineboot winebus winedevice winehid wineps winevulkan winex11 winexinput wininet winmm winspool wintrust wmic wmiutils ws2_32
+		## libs_nsdedi=actxprxy advapi32 api-ms-win-crt-convert-l1-1-0 api-ms-win-crt-environment-l1-1-0 api-ms-win-crt-filesystem-l1-1-0 api-ms-win-crt-heap-l1-1-0 api-ms-win-crt-locale-l1-1-0 api-ms-win-crt-math-l1-1-0 api-ms-win-crt-runtime-l1-1-0 api-ms-win-crt-stdio-l1-1-0 api-ms-win-crt-string-l1-1-0 api-ms-win-crt-time-l1-1-0 api-ms-win-crt-utility-l1-1-0 avifil32 bcrypt combase comctl32 concrt140 conhost crypt32 dbghelp dnsapi dsound explorer gdi32 hid hidclass hidparse imm32 iphlpapi kerberos kernel32 kernelbase mmdevapi mountmgr msacm32 msv1_0 msvcp110 msvcp140 msvcr110 msvcrt msvfw32 ndis netapi32 normaliz nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 opengl32 plugplay psapi rpcrt4 rpcss rsaenh schannel sechost secur32 services setupapi shcore shell32 shlwapi svchost tzres ucrtbase user32 userenv uxtheme vcruntime140 vcruntime140_1 version wevtsvc win32u wineboot winebus winedevice winehid winex11 winmm wldap32 ws2_32 wsock32 xinput1_3
+		## https://gist.github.com/pg9182/9cdc3e8fe52aafc137d7f114b99fa420
+		## the additional disables were based on manual inspection of dlls only loaded twice during wineprefix setup and by manually checking for thirdparty libs not referenced anymore due to the removals (I'm keeping those --without flags separate since they only work if we're disabling some of the dlls)
+		#
+		# ctr="$(docker run --detach --tty --rm -e NS_SERVER_NAME=test ... --entrypoint /bin/ash ghcr.io/pg9182/northstar-dedicated:1.20220117.git5ce2886-tf2.0.11.0-ns1.4.0)"
+		# docker exec "$ctr" sudo apk add inotify-tools
+		# docker exec "$ctr" rm -rf /home/northstar/.wine
+		# docker exec "$ctr" inotifywait -mr /usr/lib/wine/ > inotify.wineprefix.log &
+		# docker exec "$ctr" /usr/libexec/nsdedi __wineprefix__
+		# docker exec "$ctr" killall inotifywait
+		# docker exec "$ctr" inotifywait -mr /usr/lib/wine/ > inotify.nsdedi.log &
+		# docker exec -it "$ctr" /usr/libexec/nsdedi "    " # ctrl-c it after it finishes loading and registering to the master server
+		# docker exec "$ctr" killall inotifywait
+		# docker kill "$ctr"
 		#
 		# libs_wineprefix="$(cat inotify.wineprefix.log | grep "^/usr/lib/wine/x86_64-windows/" | grep " CLOSE_NOWRITE,CLOSE " | cut -d " " -f3 | cut -d. -f1 | sort | uniq -c | grep -v "\s1 " | rev | cut -d " " -f1 | rev | xargs echo)"
-		## activeds advapi32 advpack atl100 avicap32 bcrypt cng combase comctl32 comdlg32 conhost crypt32 cryptdlg cryptnet cryptui devenum dnsapi dsound explorer fltmgr gdi32 hh hidclass hidparse http ieframe iexplore imaadp32 imm32 iphlpapi kernel32 kernelbase ksecdd l3codeca light mlang mofcomp mountmgr mp3dmod mpr msacm32 msado15 msadp32 msdaps msdasql msdmo msg711 msgsm32 msisip msvcrt msvfw32 msxml msxml2 msxml3 msxml4 msxml6 ndis netio newdev notepad nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 oledb32 powershell propsys qcap qedit quartz reg regedit rpcrt4 rsaenh rundll32 sapi scsiport sechost services setupapi shcore shdocvw shell32 shlwapi start tdi tzres ucrtbase urlmon usbd user32 userenv uxtheme version wbemdisp wbemprox win32u windows windowscodecs wineboot winebus winedevice winehid winemenubuilder wineps winevulkan winex11 winexinput wininet winmm winspool wintrust wmic wmiutils wmplayer wordpad ws2_32
-		#
 		# libs_nsdedi="$(cat inotify.nsdedi.log | grep "^/usr/lib/wine/x86_64-windows/" | grep " CLOSE_NOWRITE,CLOSE " | cut -d " " -f3 | cut -d. -f1 | sort | uniq | xargs echo)"
-		## actxprxy advapi32 api-ms-win-crt-convert-l1-1-0 api-ms-win-crt-environment-l1-1-0 api-ms-win-crt-filesystem-l1-1-0 api-ms-win-crt-heap-l1-1-0 api-ms-win-crt-locale-l1-1-0 api-ms-win-crt-math-l1-1-0 api-ms-win-crt-runtime-l1-1-0 api-ms-win-crt-stdio-l1-1-0 api-ms-win-crt-string-l1-1-0 api-ms-win-crt-time-l1-1-0 api-ms-win-crt-utility-l1-1-0 avifil32 bcrypt combase comctl32 concrt140 conhost crypt32 dbghelp dnsapi dsound explorer gdi32 hid hidclass hidparse imm32 iphlpapi kerberos kernel32 kernelbase mmdevapi mountmgr msacm32 msv1_0 msvcp110 msvcp140 msvcr110 msvcrt msvfw32 ndis netapi32 normaliz nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 opengl32 plugplay propsys psapi rpcrt4 rpcss rsaenh schannel sechost secur32 services setupapi shcore shell32 shlwapi svchost tzres ucrtbase user32 userenv uxtheme vcruntime140 vcruntime140_1 version wevtsvc win32u windowscodecs wineboot winebus winedevice winehid winemenubuilder winex11 winmm wldap32 ws2_32 wsock32 xinput1_3
 		#
 		# pushd src/wine
 		# for x in programs/* dlls/*; do
@@ -270,7 +285,7 @@ dev() {
 	for file in widl wmc wrc winebuild winedump function_grep.pl \
 		 winedbg winemaker winegcc winecpp wineg++
 	do
-		mv "$pkgdir"/usr/bin/$file "$subpkgdir"/usr/bin/
+		mv "$pkgdir"/usr/bin/$file "$subpkgdir"/usr/bin/ || true
 	done
 }
 
@@ -280,9 +295,9 @@ doc() {
 }
 
 sha512sums="
-3e459b305f472ece00cbf467e14e6cfa7422381cb9242d05e9624487d559f438039aa8c780986469591c9d0f05e384380133dc6fb4ed694355ae42744a78d9b7  wine-6.23.tar.xz
-d42a367d30b93fe36b8d6418d53f3c931debef2e9b77bc73e22fff04f5f0d7b9e6622beb78592c814beb32ca214fb7e9c019c652fb2612c61358ba162a520b9d  rpath.patch
+eec17b046ed5447eb540f421c9b2748d9419ce087496c2743a9914fd27bbe5ff9da0cfe47d3cd76fa97323bd1188a1d82b1eef4968d86ed1957dc1a95e28529c  wine-7.0.tar.xz
+1f023ec35610d7f39eee5ee8e53abf8905509dd37513a1ec00f498e5e28890c60555d43daeae28b806879050b3422575f3552fa338177e923b0471c89418a607  rpath.patch
 eaaa991510d6de7f33ea8d81954737ab4a18f40675f3fa5822367fe40e439880246209d913f646e80e1120d59fcedaf97d069cf1b203c0d7d032bc8b07faa29d  winemenubuilder.patch
-7bec960a777939fee9503859b110d3c89aab944b2b084c543299e632d036599556f48c2b98c6d630df660758c8a0a68e3ddca28e8565cd279a8642e9a2f25a75  ws2siobacklogquery.patch
+bf1630e4f8aab6b220eb95beafe2891549bb6d7be17aed9bbd1269409fd589f05fc9b68c123d58cdfc5eff60d53518b232c59b6c4648b7c6e36a2416f4913d33  ws2siobacklogquery.patch
 "
-#22621c5096adaa8dcc62cd246a4ec2547b4673e8d5a12cc7ad67cb03804804f24d9d0e6d8d40780f1f42c1219e63e13d0bb8f3e165a73fab05fdb1832e8c91fa  createwindow.patch
+#996a6fcf19875b170eb51ccd6f4e5ec32f77326a7ab8c6227c0fa4e3acacf9330efeafdb77de17a176e73d1ec7f58cac3293302833284ce805b6b5e751f9615e  createwindow.patch
