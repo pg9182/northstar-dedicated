@@ -437,7 +437,7 @@ func setuppty() (*PTY, error) {
 	return pty, nil
 }
 
-// interceptsl intercepts escape sequences to set the terminal title.
+// interceptsl intercepts escape sequences to set the terminal title and ignore unnecessary junk.
 func interceptsl(ctx context.Context, w io.Writer, r io.Reader, title chan<- string) error {
 	state := 0
 	ibuf := make([]byte, 256)
@@ -494,6 +494,8 @@ func interceptsl(ctx context.Context, w io.Writer, r io.Reader, title chan<- str
 					obuf = append(obuf, 0x1B, c)
 				case ']':
 					state = 2
+				case '[':
+					state = 12
 				}
 			case 2: // at \x1B]
 				switch c {
@@ -547,6 +549,42 @@ func interceptsl(ctx context.Context, w io.Writer, r io.Reader, title chan<- str
 				case 0x1B:
 					// start of a new escape sequence (this shouldn't happen)
 					state = 1
+				}
+			case 12: // at \x1B[
+				switch c {
+				default:
+					state = 0
+					obuf = append(obuf, 0x1B, '[', c)
+				case '?':
+					state = 13
+				}
+			case 13: // at \x1B[?
+				switch c {
+				default:
+					state = 0
+					obuf = append(obuf, 0x1B, '[', '?', c)
+				case '2':
+					state = 14
+				}
+			case 14: // at \x1B[?2
+				switch c {
+				default:
+					state = 0
+					obuf = append(obuf, 0x1B, '[', '?', '2', c)
+				case '5':
+					state = 15
+				}
+			case 15: // at \x1B[?25
+				switch c {
+				default:
+					state = 0
+					obuf = append(obuf, 0x1B, '[', '?', '2', '5', c)
+				case 'l':
+					// ignore hide cursor
+					state = 0
+				case 'h':
+					// ignore show cursor
+					state = 0
 				}
 			}
 		}
