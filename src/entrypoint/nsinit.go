@@ -154,12 +154,6 @@ func main() {
 	nsc.Display(os.Stdout, "    ")
 	fmt.Println()
 
-	// This is needed since there's an issue with my current method of
-	// eliminating x11 by simply making CreateWindow and ShowWindow always
-	// successful in Wine's nulldrv. Apparently, it causes in-game time to slow
-	// down for some users. More testing will be required.
-	xvfb := 9
-
 	fmt.Println("Starting Northstar...")
 	sn, _ := nsc.Get("ns_server_name")
 	updatetitle(sn)
@@ -170,7 +164,6 @@ func main() {
 		return
 	}
 	nsi.Output = os.Stdout
-	nsi.Xvfb = &xvfb
 	nsi.InfoCallback = func(ns NSInstanceStatus) {
 		updatetitle(sn + " [" + ns.String() + "]")
 	}

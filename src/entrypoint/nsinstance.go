@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -24,7 +23,6 @@ type NSInstance struct {
 	Executable string
 	Args       []string
 
-	Xvfb         *int
 	Output       io.Writer
 	InfoCallback InfoCallbackFunc
 
@@ -144,7 +142,6 @@ func (n *NSInstance) Run() error {
 	default:
 	}
 
-	xvfbResult := make(chan error, 1)
 	gameResult := make(chan error, 1)
 
 	n.mu.Lock()
@@ -157,41 +154,6 @@ func (n *NSInstance) Run() error {
 		"WINEDEBUG=fixme-secur32,fixme-bcrypt,fixme-ver,err-wldap32",
 	)
 	n.mu.Unlock()
-
-	var xb bytes.Buffer
-	if n.Xvfb != nil {
-		display := ":" + strconv.Itoa(*n.Xvfb)
-
-		if n.Output != nil {
-			fmt.Fprintf(n.Output, "Starting xvfb on display %s...\n", display)
-		}
-
-		// clean up old xvfb lock file
-		os.Remove("/tmp/.X" + strconv.Itoa(*n.Xvfb) + "-lock")
-
-		xvfbCmd := exec.Command("Xvfb", display)
-		xvfbCmd.Env = n.env()
-		xvfbCmd.Stdout = &xb
-		xvfbCmd.Stderr = &xb
-		xvfbCmd.Stdin = nil
-
-		if err := xvfbCmd.Start(); err != nil {
-			return fmt.Errorf("failed to start xvfb: %w", err)
-		}
-		go func() {
-			xvfbResult <- xvfbCmd.Wait()
-		}()
-		defer func() {
-			if xvfbCmd.ProcessState != nil && !xvfbCmd.ProcessState.Exited() {
-				xvfbCmd.Process.Signal(syscall.SIGKILL)
-			}
-		}()
-		time.Sleep(time.Second * 2)
-
-		n.gameCmd.Env = append(n.gameCmd.Env,
-			"DISPLAY="+display,
-		)
-	}
 
 	if err := n.gameCmd.Start(); err != nil {
 		return fmt.Errorf("failed to start game (%q, %q, %q): %w", n.Dir, n.Executable, n.Args, err)
@@ -211,15 +173,6 @@ func (n *NSInstance) Run() error {
 	)
 	for {
 		select {
-		case err := <-xvfbResult:
-			if n.Output != nil {
-				io.Copy(n.Output, &xb)
-			}
-			if err != nil {
-				return fmt.Errorf("xvfb exited prematurely: %w", err)
-			}
-			return fmt.Errorf("xvfb exited prematurely")
-
 		case err := <-gameResult: // waiter exited
 			select {
 			case <-n.terminated:

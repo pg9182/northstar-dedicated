@@ -11,7 +11,7 @@ arch="x86_64"
 provides="wine=${pkgver}"
 subpackages="$pkgname-dev $pkgname-doc"
 depends_dev="$pkgname perl"
-makedepends="autoconf automake bison flex gnutls-dev libxi-dev mingw-w64-gcc mingw-w64-binutils linux-headers"
+makedepends="autoconf automake bison flex gnutls-dev mingw-w64-gcc mingw-w64-binutils linux-headers"
 
 # changes:
 # - rpath.patch: needed for wine on alpine
@@ -74,13 +74,13 @@ build() {
 		--without-v4l2 \
 		--without-vkd3d \
 		--without-vulkan \
-		--with-x \
+		--without-x \
 		--without-xcomposite \
 		--without-xcursor \
 		--without-xfixes \
 		--without-xinerama \
 		--without-xinput \
-		--with-xinput2 \
+		--without-xinput2 \
 		--without-xrandr \
 		--without-xrender \
 		--without-xshape \
