@@ -13,18 +13,20 @@ subpackages="$pkgname-dev $pkgname-doc"
 depends_dev="$pkgname perl"
 makedepends="autoconf automake bison flex gnutls-dev libxi-dev mingw-w64-gcc mingw-w64-binutils linux-headers"
 
-# note: I've disabled the CreateWindow patch (which was to remove the need for
-# X11 to run the dedicated server) since it seems to cause time to slow down
-# in-game (possibly caused by the 6+ repeated calls to PeekMessage for the
-# window handle in-between ticks). This will need more debugging later.
+# changes:
+# - rpath.patch: needed for wine on alpine
+# - winemenubuilder.patch: to clean up unnecessary cruft
+# - ws2siobacklogquery.patch: to suppress a spammy log message
+# - createwindow.patch: to allow tf2 to run without X11
+# - --disable-* options: to significantly reduce the size of the wine build
 
 options="textrels !check"
 source="https://dl.winehq.org/wine/source/7.0/wine-$pkgver.tar.xz
 	rpath.patch
 	winemenubuilder.patch
 	ws2siobacklogquery.patch
+	createwindow.patch
 	"
-#	createwindow.patch
 
 builddir="$srcdir/wine-$pkgver"
 
@@ -299,5 +301,5 @@ eec17b046ed5447eb540f421c9b2748d9419ce087496c2743a9914fd27bbe5ff9da0cfe47d3cd76f
 1f023ec35610d7f39eee5ee8e53abf8905509dd37513a1ec00f498e5e28890c60555d43daeae28b806879050b3422575f3552fa338177e923b0471c89418a607  rpath.patch
 eaaa991510d6de7f33ea8d81954737ab4a18f40675f3fa5822367fe40e439880246209d913f646e80e1120d59fcedaf97d069cf1b203c0d7d032bc8b07faa29d  winemenubuilder.patch
 bf1630e4f8aab6b220eb95beafe2891549bb6d7be17aed9bbd1269409fd589f05fc9b68c123d58cdfc5eff60d53518b232c59b6c4648b7c6e36a2416f4913d33  ws2siobacklogquery.patch
+74e855d4b59dbd73adc02f9de2a803eced0bf5d1036c76efe7c56cfe4ad0feb7d159a8ddadd1eb0cc77713c8cf2fc69f5ac411efe1ff498bb5a5991a99ab7ddf  createwindow.patch
 "
-#996a6fcf19875b170eb51ccd6f4e5ec32f77326a7ab8c6227c0fa4e3acacf9330efeafdb77de17a176e73d1ec7f58cac3293302833284ce805b6b5e751f9615e  createwindow.patch

@@ -1,8 +1,8 @@
 diff --git a/dlls/user32/driver.c b/dlls/user32/driver.c
-index 73f4ee67257..f914333b534 100644
+index 73f4ee67257..7dc9cf941f8 100644
 --- a/dlls/user32/driver.c
 +++ b/dlls/user32/driver.c
-@@ -161,16 +161,7 @@ static void CDECL nulldrv_UpdateClipboard(void)
+@@ -161,16 +161,12 @@ static void CDECL nulldrv_UpdateClipboard(void)
  
  static BOOL CDECL nodrv_CreateWindow( HWND hwnd )
  {
@@ -16,11 +16,16 @@ index 73f4ee67257..f914333b534 100644
 -    ERR_(winediag)( "Application tried to create a window, but no driver could be loaded.\n" );
 -    if (driver_load_error[0]) ERR_(winediag)( "%s\n", driver_load_error );
 -    return FALSE;
++    // this is very simplified and not technically correct behaviour,
++    // but it's enough to make source think the tf2 window is active
++    // and prevent it from adding an additional delay to frames/ticks
++    SendMessageW(hwnd, WM_CREATE, 0, 0);
++    SendMessageW(hwnd, WM_ACTIVATEAPP, TRUE, 0);
 +    return TRUE;
  }
  
  static BOOL CDECL nulldrv_CreateDesktopWindow( HWND hwnd )
-@@ -242,7 +233,7 @@ static void CDECL nulldrv_SetWindowText( HWND hwnd, LPCWSTR text )
+@@ -242,7 +238,7 @@ static void CDECL nulldrv_SetWindowText( HWND hwnd, LPCWSTR text )
  
  static UINT CDECL nulldrv_ShowWindow( HWND hwnd, INT cmd, RECT *rect, UINT swp )
  {
