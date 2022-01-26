@@ -22,7 +22,7 @@
 1.  Copy the game files to your server, optionally removing [unnecessary files](#qs-reduce-size) to reduce the size.
 2.  Start the container (replace `/path/to/titanfall2` with the patch from step 1):
     ```bash
-    docker run --rm --interactive --pull always --publish 8081:8081/tcp --publish 37015:37015/udp --mount "type=bind,source=/path/to/titanfall2,target=/mnt/titanfall" --env NS_SERVER_NAME="[YOUR-REGION] Your server name" ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0
+    docker run --rm --interactive --pull always --publish 8081:8081/tcp --publish 37015:37015/udp --mount "type=bind,source=/path/to/titanfall2,target=/mnt/titanfall,readonly" --env NS_SERVER_NAME="[YOUR-REGION] Your server name" ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0
     ```
 
 ## Versioning
