@@ -426,7 +426,7 @@ func setuppty() (*PTY, error) {
 
 	if err := pty.SetWinsz(Winsize{
 		Row:    25,
-		Col:    120,
+		Col:    1200,
 		XPixel: 0,
 		YPixel: 0,
 	}); err != nil {
