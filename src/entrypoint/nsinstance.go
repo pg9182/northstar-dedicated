@@ -47,7 +47,7 @@ type NSInstanceStatus struct {
 	MaxPlayers   int
 }
 
-var titleRe = regexp.MustCompile(`^Titanfall 2 dedicated server - ([A-Za-z0-9_]+) ([0-9]+)/([0-9]+) players \(([A-Za-z0-9_]+)\)`) // TODO: updates: ensure this is still accurate
+var titleRe = regexp.MustCompile(` - ([A-Za-z0-9_]+) ([0-9]+)/([0-9]+) players \(([A-Za-z0-9_]+)\)`) // TODO: updates: ensure this is still accurate
 
 func (n *NSInstanceStatus) ParseTitle(title string) bool {
 	m := titleRe.FindStringSubmatch(title)
