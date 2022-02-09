@@ -6,6 +6,7 @@
 
 ## Features
 
+- **Much more efficient** than the running the server on Windows in general, especially around RAM usage.
 - **Shares read-only game files** between multiple instances.
 - **Environment variable configuration** support for convars and arguments.
 - **Stable versioning scheme** with compatibility guarantees, smoothing over changes in Northstar itself and making automatic container updates safer.
@@ -51,7 +52,7 @@ To use this docker container, you will need a copy of the Titanfall 2 game files
 
 - **CPU:** x86_64, at least 3 cores/threads (in the future, it will likely be able to run on 1).
 - **RAM:** 2GB (physical or swap) per instance (it typically peaks to ~1.6GB at launch then settles to around 1GB).
-- **Network:** A 16-player instance generally uses about 7-20 Mbps up (note that pilot game modes tend to use more bandwidth than titan-only ones).
+- **Network:** A 16-player instance generally uses about 7-20 Mbps up (note that pilot game modes tend to use more bandwidth than titan-only ones) (this can be reduced significantly; see the FAQ at the bottom).
 - **Disk:** With the instructions in the next section, each physical server (the game files are mounted read-only into the container and shared between instances) requires ~5GB for the game files. The container image is currently ~380MB. At startup, Titanfall reads ~1.75 GB before it reaches the lobby. Storing the files on tmpfs may improve performance.
 
 ### Reducing the size <a name="qs-reduce-size"></a>
@@ -492,8 +493,14 @@ Additional command-line arguments (including convars starting with `+`) can be p
 
 ### FAQ
 
+- **The server status in htop isn't updating** <br/>
+  Press F2 to enter setup, then enable `Update process names on every refresh`. I also recommend enabling `Hide userland process threads` to reduce the clutter.
 - **How do I override built-in mods?** <br/>
   You can extend the image with your changes as additional steps modifying `/usr/lib/northstar`. Alternatively, you can mount the mods read-only into `/usr/lib/northstar/R2Northstar/mods`, but this is not officially supported and may break at any time.
+- **How do I get old logs after a crash?** <br/>
+  With the default Docker configuration, if you add a name to the container and remove `--rm`, you will be able to used `docker logs` to view them. You can also use a log management solution like Loki (via promtail or the Docker driver). Consider adding `+spewlog_enable 0` to `NS_EXTRA_ARGUMENTS` to reduce the logspam.
+- **How can I optimize the server and reduce the bandwidth required for running it?** <br/>
+  Add `+net_compresspackets 1 +net_compresspackets_minsize 64 +net_encryptpackets 0 +sv_maxrate 127000` to `NS_EXTRA_ARGUMENTS`. The CPU overhead is neglegible.
 
 ### Deployment
 
@@ -501,7 +508,87 @@ The following sections provide example configuration for deploying the container
 
 #### docker-compose
 
-TODO
+Example configuration (simple):
+
+```yml
+version: "3.9"
+
+services:
+  northstar1:
+    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0-ns1.4.0
+    pull_policy: always
+    environment:
+      - NS_PORT=37015
+      - NS_PORT_AUTH=8081
+      - 'NS_SERVER_NAME=your server name'
+      - 'NS_SERVER_DESC=your server description'
+      - |
+        NS_EXTRA_ARGUMENTS=
+        +setplaylist private_match
+        +net_compresspackets_minsize 64
+        +net_compresspackets 1
+        +spewlog_enable 0
+        +net_encryptpackets 0
+        +sv_maxrate 127000
+    volumes:
+      - ./titanfall/2.0.11.0-dedicated-mp:/mnt/titanfall:ro
+    ports:
+      - '37015:37015/udp'
+      - '8081:8081/tcp'
+    restart: always
+```
+
+Example configuration (complex):
+
+```yml
+version: "3.9"
+
+x-logging:
+  &logging
+  logging:
+    driver: "json-file"
+    options:
+      max-file: "5"
+      max-size: "400m"
+
+services:
+  northstar1:
+    << : *logging
+    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0-ns1.4.0
+    pull_policy: always
+    environment:
+      - NS_PORT=37015
+      - NS_PORT_AUTH=37115
+      - 'NS_SERVER_NAME=your server name, possibly with {{hostname}}'
+      - 'NS_SERVER_DESC=your server description, which can also include {{hostname}}'
+      - NS_RETURN_TO_LOBBY=0
+      - NS_INSECURE=0
+      - |
+        NS_EXTRA_ARGUMENTS=
+        +setplaylist private_match
+        +ns_private_match_only_host_can_change_settings 1
+        +ns_private_match_last_mode turbo_ttdm
+        +ns_private_match_countdown_length 0
+        +ns_should_return_to_lobby 0
+        +setplaylistvaroverrides "max_players 24 respawn_delay 0 run_epilogue 0 earn_meter_titan_multiplier 2 aegis_upgrades 1 titan_shield_regen 1"
+        +net_compresspackets_minsize 64
+        +net_compresspackets 1
+        +spewlog_enable 0
+        +net_encryptpackets 0
+        +sv_maxrate 127000
+        +rcon_admin 1009497984978
+        +grant_admin 1009497984978
+        +autoannounce "map console (`) commands: !skip to vote skip, !extend to vote extend"
+    volumes:
+      - ./titanfall/2.0.11.0-dedicated-mp:/mnt/titanfall:ro
+      - ./mods/RCON:/mnt/mods/RCON:ro
+      - ./mods/Karma.Abuse:/mnt/mods/Karma.Abuse:ro
+      - ./mods/Takyon.PlayerVote:/mnt/mods/Takyon.PlayerVote:ro
+    ports:
+      - '37015:37015/udp'
+      - '37115:37115/tcp'
+    restart: always
+```
 
 #### kubernetes
 
