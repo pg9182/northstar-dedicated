@@ -28,6 +28,10 @@ FROM build AS build-northstar
 COPY --chown=nsbuild:nsbuild ./northstar/ /nsbuild/src/main/northstar/
 RUN cd /nsbuild/src/main/northstar && abuild -r
 
+FROM build AS build-nswrap
+COPY --chown=nsbuild:nsbuild ./nswrap/ /nsbuild/src/main/nswrap/
+RUN cd /nsbuild/src/main/nswrap && abuild -r
+
 FROM build AS build-entrypoint
 COPY --chown=nsbuild:nsbuild ./entrypoint/ /nsbuild/src/main/entrypoint/
 RUN cd /nsbuild/src/main/entrypoint && abuild -r
@@ -43,14 +47,16 @@ RUN --mount=from=build,source=/etc/apk/keys,target=/etc/apk/keys \
 RUN --mount=from=build,source=/etc/apk/keys,target=/etc/apk/keys \
     --mount=from=build-gfsdk,source=/nsbuild/packages/main/x86_64,target=/nsbuild/gfsdk \
     --mount=from=build-d3d11,source=/nsbuild/packages/main/x86_64,target=/nsbuild/d3d11 \
+    --mount=from=build-nswrap,source=/nsbuild/packages/main/x86_64,target=/nsbuild/nswrap \
     --mount=from=build-entrypoint,source=/nsbuild/packages/main/x86_64,target=/nsbuild/entrypoint \
-    apk add --no-cache /nsbuild/gfsdk/*.apk /nsbuild/d3d11/*.apk /nsbuild/entrypoint/*.apk
+    apk add --no-cache /nsbuild/gfsdk/*.apk /nsbuild/d3d11/*.apk /nsbuild/nswrap/*.apk /nsbuild/entrypoint/*.apk
 
 RUN adduser -D northstar && \
     echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
     mkdir /mnt/titanfall /mnt/mods
 USER northstar
 
+ENV WINEPREFIX="/home/northstar/.wine"
 RUN /usr/libexec/nsdedi __wineprefix__ && \
     for x in \
         /home/northstar/.wine/drive_c/"Program Files"/"Common Files"/System/*/* \
@@ -74,4 +80,4 @@ RUN /usr/libexec/nsdedi __wineprefix__ && \
     done
 EXPOSE 8081/tcp
 EXPOSE 37015/udp
-ENTRYPOINT ["/usr/libexec/nsdedi", "                                                                                                                        "]
+ENTRYPOINT ["/usr/libexec/nsdedi"]
