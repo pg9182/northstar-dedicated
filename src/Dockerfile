@@ -14,27 +14,27 @@ RUN mkdir -p /nsbuild/src/main /nsbuild/packages/main && \
 
 FROM build AS build-wine
 COPY --chown=nsbuild:nsbuild ./wine/ /nsbuild/src/main/wine/
-RUN cd /nsbuild/src/main/wine && abuild -r
+RUN ulimit -n 1024; cd /nsbuild/src/main/wine && abuild -r
 
 FROM build AS build-gfsdk
 COPY --chown=nsbuild:nsbuild ./gfsdk/ /nsbuild/src/main/gfsdk/
-RUN cd /nsbuild/src/main/gfsdk && abuild -r
+RUN ulimit -n 1024; cd /nsbuild/src/main/gfsdk && abuild -r
 
 FROM build AS build-d3d11
 COPY --chown=nsbuild:nsbuild ./d3d11/ /nsbuild/src/main/d3d11/
-RUN cd /nsbuild/src/main/d3d11 && abuild -r
+RUN ulimit -n 1024; cd /nsbuild/src/main/d3d11 && abuild -r
 
 FROM build AS build-northstar
 COPY --chown=nsbuild:nsbuild ./northstar/ /nsbuild/src/main/northstar/
-RUN cd /nsbuild/src/main/northstar && abuild -r
+RUN ulimit -n 1024; cd /nsbuild/src/main/northstar && abuild -r
 
 FROM build AS build-nswrap
 COPY --chown=nsbuild:nsbuild ./nswrap/ /nsbuild/src/main/nswrap/
-RUN cd /nsbuild/src/main/nswrap && abuild -r
+RUN ulimit -n 1024; cd /nsbuild/src/main/nswrap && abuild -r
 
 FROM build AS build-entrypoint
 COPY --chown=nsbuild:nsbuild ./entrypoint/ /nsbuild/src/main/entrypoint/
-RUN cd /nsbuild/src/main/entrypoint && abuild -r
+RUN ulimit -n 1024; cd /nsbuild/src/main/entrypoint && abuild -r
 
 FROM base
 RUN apk add --no-cache gnutls tzdata ca-certificates sudo

@@ -515,7 +515,7 @@ version: "3.9"
 
 services:
   northstar1:
-    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0-ns1.4.0
+    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0
     pull_policy: always
     environment:
       - NS_PORT=37015
@@ -531,7 +531,7 @@ services:
         +net_encryptpackets 0
         +sv_maxrate 127000
     volumes:
-      - ./titanfall/2.0.11.0-dedicated-mp:/mnt/titanfall:ro
+      - /path/to/titanfall:/mnt/titanfall:ro
     ports:
       - '37015:37015/udp'
       - '8081:8081/tcp'
