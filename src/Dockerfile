@@ -38,18 +38,15 @@ RUN ulimit -n 1024; cd /nsbuild/src/main/entrypoint && abuild -r
 
 FROM base
 RUN apk add --no-cache gnutls tzdata ca-certificates sudo
-RUN --mount=from=build,source=/etc/apk/keys,target=/etc/apk/keys \
-    --mount=from=build-wine,source=/nsbuild/packages/main/x86_64,target=/nsbuild/wine \
-    apk add --no-cache /nsbuild/wine/northstar-dedicated-wine-[0-9]*-r*.apk xvfb
-RUN --mount=from=build,source=/etc/apk/keys,target=/etc/apk/keys \
-    --mount=from=build-northstar,source=/nsbuild/packages/main/x86_64,target=/nsbuild/northstar \
-    apk add --no-cache /nsbuild/northstar/*.apk
-RUN --mount=from=build,source=/etc/apk/keys,target=/etc/apk/keys \
-    --mount=from=build-gfsdk,source=/nsbuild/packages/main/x86_64,target=/nsbuild/gfsdk \
+RUN --mount=from=build-wine,source=/nsbuild/packages/main/x86_64,target=/nsbuild/wine \
+    apk add --no-cache --allow-untrusted /nsbuild/wine/northstar-dedicated-wine-[0-9]*-r*.apk xvfb
+RUN --mount=from=build-northstar,source=/nsbuild/packages/main/x86_64,target=/nsbuild/northstar \
+    apk add --no-cache --allow-untrusted /nsbuild/northstar/*.apk
+RUN --mount=from=build-gfsdk,source=/nsbuild/packages/main/x86_64,target=/nsbuild/gfsdk \
     --mount=from=build-d3d11,source=/nsbuild/packages/main/x86_64,target=/nsbuild/d3d11 \
     --mount=from=build-nswrap,source=/nsbuild/packages/main/x86_64,target=/nsbuild/nswrap \
     --mount=from=build-entrypoint,source=/nsbuild/packages/main/x86_64,target=/nsbuild/entrypoint \
-    apk add --no-cache /nsbuild/gfsdk/*.apk /nsbuild/d3d11/*.apk /nsbuild/nswrap/*.apk /nsbuild/entrypoint/*.apk
+    apk add --no-cache --allow-untrusted /nsbuild/gfsdk/*.apk /nsbuild/d3d11/*.apk /nsbuild/nswrap/*.apk /nsbuild/entrypoint/*.apk
 
 RUN adduser -D northstar && \
     echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
