@@ -458,6 +458,10 @@ While working on the stubs, I needed to trace which DirectX calls Titanfall uses
 
 ARM64 support (mostly for running this on the Oracle Free Tier) is currently blocked by [ptitSeb/box64#210](https://github.com/ptitSeb/box64/issues/210). FEX and qemu-user are too slow to run Northstar.
 
+### Windows
+
+The d3d11 and gfsdk stubs I developed for northstar-dedicated can be used when running the dedicated server on Windows to drastically reduce the required resources. Unlike with Wine, you will need to put them in `bin/x64_retail` instead of the directory `NorthstarLauncher.exe` is contained in. I am planning to investigate alternative ways to load the DLLs at some point in the future.
+
 ## Container
 
 TODO: More documentation, FAQ, etc.
