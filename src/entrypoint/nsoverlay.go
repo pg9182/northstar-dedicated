@@ -11,7 +11,7 @@ type NSOverlay struct {
 	Path string
 }
 
-func MergeOverlay(dir, tfPath, nsPath, dxPath, gfsdkPath, modsPath string) (*NSOverlay, error) {
+func MergeOverlay(dir, tfPath, nsPath, stubsPath, modsPath string) (*NSOverlay, error) {
 	n := new(NSOverlay)
 	if p, err := os.MkdirTemp(dir, "ns*"); err != nil {
 		return nil, fmt.Errorf("create temp dir in %q: %w", dir, err)
@@ -26,13 +26,9 @@ func MergeOverlay(dir, tfPath, nsPath, dxPath, gfsdkPath, modsPath string) (*NSO
 		n.Delete()
 		return nil, fmt.Errorf("merge northstar: %w", err)
 	}
-	if err := n.mergeDX(dxPath); err != nil {
+	if err := n.mergeStubs(stubsPath); err != nil {
 		n.Delete()
-		return nil, fmt.Errorf("merge northstar-dedicated-d3d11: %w", err)
-	}
-	if err := n.mergeGFSDK(gfsdkPath); err != nil {
-		n.Delete()
-		return nil, fmt.Errorf("merge northstar-dedicated-gfsdk: %w", err)
+		return nil, fmt.Errorf("merge northstar-stubs: %w", err)
 	}
 	if err := n.mergeMods(modsPath); err != nil {
 		n.Delete()
@@ -97,19 +93,9 @@ func (n *NSOverlay) mergeNS(p string) error {
 	})
 }
 
-func (n *NSOverlay) mergeDX(p string) error {
+func (n *NSOverlay) mergeStubs(p string) error {
 	for _, x := range []string{
 		"d3d11.dll",
-	} {
-		if err := checkedSymlink(filepath.Join(p, x), filepath.Join(n.Path, x)); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (n *NSOverlay) mergeGFSDK(p string) error {
-	for _, x := range []string{
 		"GFSDK_SSAO.win64.dll",
 		"GFSDK_TXAA.win64.dll",
 	} {

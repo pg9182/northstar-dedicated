@@ -9,7 +9,7 @@ license="Zlib"
 
 arch="x86_64"
 makedepends="go"
-# commenting this out so we can build it separately: depends="northstar northstar-dedicated-nswrap northstar-dedicated-d3d11 northstar-dedicated-wine xvfb"
+# commenting this out so we can build it separately: depends="northstar northstar-dedicated-nswrap northstar-stubs northstar-dedicated-wine xvfb"
 
 options="!check"
 source="

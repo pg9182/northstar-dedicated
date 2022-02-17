@@ -69,8 +69,7 @@ func main() {
 		"/tmp",
 		"/mnt/titanfall",
 		"/usr/lib/northstar",
-		"/usr/lib/northstar-dedicated-d3d11",
-		"/usr/lib/northstar-dedicated-gfsdk",
+		"/usr/lib/northstar-stubs",
 		"/mnt/mods",
 	)
 	if err != nil {
