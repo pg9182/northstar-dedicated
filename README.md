@@ -11,7 +11,7 @@
 - **Environment variable configuration** support for convars and arguments.
 - **Stable versioning scheme** with compatibility guarantees, smoothing over changes in Northstar itself and making automatic container updates safer.
 - **Layered docker image** for faster builds, smaller downloads, and a much lower disk footprint.
-- **Includes custom d3d11 and gfsdk stubs**, reducing the memory usage (by ~700 MB), and eliminating the need for a physical or emulated GPU.
+- **Includes custom d3d11 and gfsdk stubs**, reducing the memory usage (by ~700 MB), and eliminating the need for a physical or emulated GPU (these are now part of the [R2Northstar](https://github.com/R2Northstar/NorthstarStubs) organization).
 - **Includes a custom wine build** to reduce the size of the container (it will get even smaller soon).
 - **Minimal Docker container** based on Alpine Linux.
 - **Updates the process name to include the server status** (similar to the process title when running on Windows).
@@ -460,7 +460,7 @@ ARM64 support (mostly for running this on the Oracle Free Tier) is currently blo
 
 ### Windows
 
-The d3d11 and gfsdk stubs I developed for northstar-dedicated can be used when running the dedicated server on Windows to drastically reduce the required resources. Unlike with Wine, you will need to put them in `bin/x64_retail` instead of the directory `NorthstarLauncher.exe` is contained in. I am planning to investigate alternative ways to load the DLLs at some point in the future.
+The d3d11 and gfsdk stubs I developed for northstar-dedicated can be used when running the dedicated server on Windows to drastically reduce the required resources. Unlike with Wine, you will need to put them in `bin/x64_retail` instead of the directory `NorthstarLauncher.exe` is contained in. See [here](https://github.com/R2Northstar/NorthstarStubs) for more details.
 
 ## Container
 
