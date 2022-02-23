@@ -60,7 +60,7 @@ To use this docker container, you will need a copy of the Titanfall 2 game files
 To slim down a Titanfall 2 install, delete the files as specified below.
 
 - delete `vpk/client_sp_* englishclient_sp_*`
-- delete `r2/maps/sp_*`
+- delete `r2/maps`
 - delete `r2/paks/` except for `{patch_master,{common,common_mp,highlight,particle_scripts}{,\(*}}.rpak ui{,\(*}.dll`
 - delete `r2/sound/**`
 - delete `r2/media`
@@ -132,31 +132,6 @@ db9e4bfa53d3b177bcd29b212b6c6f752c6a1bdd7e6201ef6c2ee746f65800eb         86 2017
 4cc6ab038411cdf683c10aa90f7628d8617b996737eeb725e9dea8a5ab975e02         87 2017-11-29 13:32:18 r2/cfg/mem_level_0_pc.ekv
 8577da2ea54085708b3b851bc50315a36bb740ba5135e747cfb12457b5d3060f          4 2017-11-29 13:32:18 r2/cfg/video_settings_changed_quit.cfg
 5b27f13704d139c29bb2fa06ad6b043cb86da3be160704b0ddab8136df40ca4a       1511 2017-11-29 13:32:20 r2/GameInfo.txt
--                                                                      4096 2017-12-05 20:04:00 r2/maps/
-74d371bab64c63e174144dd24bcaf8201b7c9089a38df2c10cc269feda7ca475   56837238 2017-11-29 13:32:24 r2/maps/mp_angel_city.stbsp
-bb562ae5772bd208f486eedbe851b49984212153986513aab9cb17e5dd535694   19557224 2017-11-29 13:32:28 r2/maps/mp_black_water_canal.stbsp
-f2efe77edf5e506759c91723fb6f7383bb5495fa03da222992880f091f99367a     401625 2017-11-29 13:32:30 r2/maps/mp_coliseum.stbsp
-725f3d985216deccee98da1241f2158e5963dc84f34048b1e445d64c83c56bd0     452845 2017-11-29 13:32:30 r2/maps/mp_coliseum_column.stbsp
-d47dfd1c4ef6edfec6bfdb62c31822aa55e27baf1e24dbc9de2b33ebadee36e9  122192407 2017-11-29 13:32:32 r2/maps/mp_colony02.stbsp
-dff0b9e5e91b946bb203baf09be670b33162fac946916940cbaf59d3b0ddfd8b   38820729 2017-11-29 13:32:32 r2/maps/mp_complex3.stbsp
-54cb9fc00c312fa4dca3f0735b7620ca2380621aeadd57e9de21d121c0f4796e   19915898 2017-11-29 13:32:32 r2/maps/mp_crashsite3.stbsp
-a1c9292a22a5a9f048082b620a340c4fc2cc26c8b239cf6f690ef790eff397ef   31220499 2017-11-29 13:32:34 r2/maps/mp_drydock.stbsp
-80e690809a5a3fe4b0e52101cdeedc7ff1ff81f6fdc99a2c388ff58720844886  133670035 2017-11-29 13:32:38 r2/maps/mp_eden.stbsp
-58d4f7393d7ab0dcd480a50242ccde4cc8dc7fc1c0db14f30aed96003e31d8de   26916047 2017-11-29 13:32:38 r2/maps/mp_forwardbase_kodai.stbsp
-3ff31ebfe56d522a3031e3e9796089119dddd972a0f9573ac64111ae711a4335   13847136 2017-11-29 13:32:40 r2/maps/mp_glitch.stbsp
-554464ad03ae490ba7c23148aa6f6f101258afed5ef23ed06ebbeebfe539a823   21183539 2017-11-29 13:32:42 r2/maps/mp_grave.stbsp
-2848ae22c232b26341c5007683a2c11e8d1a48e490307684c021351609f094bd   30844457 2017-11-29 13:32:44 r2/maps/mp_homestead.stbsp
-636a0c43396c8e9f0ceee3c1be6c931c2631cf9f4c206e51ab536195e456d00f    3477822 2017-11-29 13:32:44 r2/maps/mp_lf_deck.stbsp
-2ff4d6acbc54ed42ed7474b6e78123e4b335c75bec83dc1883dadfe646cc5b4a    1755283 2017-11-29 13:32:44 r2/maps/mp_lf_meadow.stbsp
-87028cad410a35dc37633fa44434723b32352820f3daccde8ba12df9dc8eb74f    1543293 2017-11-29 13:32:44 r2/maps/mp_lf_stacks.stbsp
-f7a203c85641c6c3a932ee01d8007ea114efdd07c71ad8ee54d6ae091a2616fc    1695579 2017-11-29 13:32:46 r2/maps/mp_lf_township.stbsp
-e9cc479cfd1b5c2969b01114aae1612efcd93582aa0d8c4e0f46304ab417c00f    1513068 2017-11-29 13:32:46 r2/maps/mp_lf_traffic.stbsp
-edb4add45ee7d021f71685ac1b3db147dd290d2095756feadc63612e81546675    1698851 2017-11-29 13:32:46 r2/maps/mp_lf_uma.stbsp
-a2bfa071644b8ff9ba616fd201b43e257b481cbf59650db55bcb17e4f1903472     108857 2017-11-29 13:32:46 r2/maps/mp_lobby.stbsp
-602ed68ab8dd8e4505ec53b803cdb46ac5ec0a23154c93b9d3f85b34a37e3f83   37075030 2017-11-29 13:32:48 r2/maps/mp_relic02.stbsp
-f964435c2f1db59f30b4a37c19c8c1f0a2b22f4dffed25d40cc0e337ccb26c70   94572536 2017-11-29 13:32:50 r2/maps/mp_rise.stbsp
-25383aa857c95787b4a36d639c4209cb96e7ea72ba27453842b954367b0722f3   31141518 2017-11-29 13:32:54 r2/maps/mp_thaw.stbsp
-115090424c9371e73fd96e7c4dd5529a6220ae04532e0130f4c2e3a7b44227fb    9747744 2017-11-29 13:32:56 r2/maps/mp_wargames.stbsp
 -                                                                      4096 2017-12-05 20:04:00 r2/paks/
 -                                                                     16384 2017-12-05 20:04:00 r2/paks/Win64/
 4af25130618f67ba87fd7d95b145007c4c45de75c1b6549440bbebc9d22b2e5f   20562504 2016-11-22 15:39:50 r2/paks/Win64/common(01).rpak
