@@ -69,6 +69,7 @@ To slim down a Titanfall 2 install, delete the files as specified below.
 - delete `bin/x64_retail/{client,auditionwin64}.dll`
 - delete `bin/dxsupport.cfg`
 - delete `platform`
+- delete `Titanfall2.exe`
 - on wine without origin installed:
   - delete `Core`
   - delete `Support`
@@ -139,7 +140,6 @@ d7f48fb134fab750bac00faa25ec0e52dc54aba692debfe95f0011e17882f4d6     145880 2017
 d8987197b67b50450a390e2b5cdf71c22d06b14ef09b063a4dc9d68d4d2b0cd3        258 2017-11-29 13:38:56 r2/spectreaidata.bin
 d8987197b67b50450a390e2b5cdf71c22d06b14ef09b063a4dc9d68d4d2b0cd3        258 2017-11-29 13:38:56 r2/titanaidata.bin
 a5ca3a25c8ae56952a26141b0f6cdcb6c19086c8c39013f7cb345d5d723661af   13680184 2017-12-05 21:03:54 server.dll
-1d557ff919aa2215b324292b24362ed780942e0c7d22310ff4ca1605982d0a62    1759288 2017-12-05 20:03:58 Titanfall2.exe
 -                                                                     16384 2017-12-05 20:04:00 vpk/
 d8d4183376ef2eaecf23e7ec78587d357153af1fec35eb6fe62008d0fd273aea   64035225 2016-09-28 15:00:50 vpk/client_frontend.bsp.pak000_000.vpk
 cffa27fb940dc6b2cda9e6ce0bf178783cdbbd35b90acc68ac94ebf37e422f31    4483897 2016-10-17 17:50:18 vpk/client_frontend.bsp.pak000_001.vpk
