@@ -53,7 +53,7 @@ To use this docker container, you will need a copy of the Titanfall 2 game files
 - **CPU:** x86_64, at least 3 cores/threads (in the future, it will likely be able to run on 1).
 - **RAM:** 2GB (physical or swap) per instance (it typically peaks to ~1.6GB at launch then settles to around 1GB).
 - **Network:** A 16-player instance generally uses about 7-20 Mbps up (note that pilot game modes tend to use more bandwidth than titan-only ones) (this can be reduced significantly; see the FAQ at the bottom).
-- **Disk:** With the instructions in the next section, each physical server (the game files are mounted read-only into the container and shared between instances) requires ~5GB for the game files. The container image is currently ~380MB. At startup, Titanfall reads ~1.75 GB before it reaches the lobby. Storing the files on tmpfs may improve performance.
+- **Disk:** With the instructions in the next section, each physical server (the game files are mounted read-only into the container and shared between instances) requires ~4GB for the game files (and ~2GB if you repack the VPKs). The container image is currently ~380MB. At startup, Titanfall reads ~1.75 GB before it reaches the lobby. Storing the files on tmpfs may improve performance.
 
 ### Reducing the size <a name="qs-reduce-size"></a>
 
@@ -61,10 +61,13 @@ To slim down a Titanfall 2 install, delete the files as specified below.
 
 - delete `vpk/client_sp_* englishclient_sp_*`
 - delete `r2/maps`
-- delete `r2/paks/` except for `{patch_master,{common,common_mp,highlight,particle_scripts}{,\(*}}.rpak ui{,\(*}.dll`
+- delete `r2/cfg/*.ekv`
+- delete `r2/paks/` except for `{patch_master,{common,common_mp,highlight,particle_scripts}{,\(*}}.rpak`
 - delete `r2/sound/**`
 - delete `r2/media`
 - delete `r2/screenshots`
+- delete `bin/dxsupport.cfg`
+- delete `platform`
 - on wine without origin installed:
   - delete `Core`
   - delete `Support`
@@ -74,7 +77,6 @@ To slim down a Titanfall 2 install, delete the files as specified below.
 
 ```
 -                                                                      4096 2017-12-05 20:04:00 bin/
-3d6f78741583b11961447e3be9669e5a0b4f3c1fdb7b74daebbcfb9e9a93d2bb      88878 2017-11-29 13:20:48 bin/dxsupport.cfg
 -                                                                      4096 2017-12-05 20:04:00 bin/x64_retail/
 37bf20436643db1e483fc44a20ff5ec50abaf0c6a863a2eafaac03e9e5cdbd27     109056 2017-11-29 13:20:56 bin/x64_retail/amd_ags_x64.dll
 a3b4007b945d6008c046b4c57b11414912cff892c9e69d9185e4a2824be8d2b0     197632 2017-11-29 13:20:48 bin/x64_retail/auditionwin64.dll
@@ -102,34 +104,12 @@ bc05f50e777261ed5f1672a33e7d3da7ef7a97d188380f628ad1fe5a0d4b05c6    2662400 2017
 b22952a07850d836babdd726b27bba87fd39228658ad44a170fd5e3b51b66caf     521216 2017-12-05 17:39:12 bin/x64_retail/vstdlib.dll
 6c9f75a6fb5095719d7536b6c42cb8697dd3b41e16a142cf13694e8937daf92d         22 2017-12-05 17:38:46 build.txt
 197a1da0a134f0bd565f92d5939a014882cc64cdaf195ce563d1e0998717dead         12 2017-12-05 17:38:46 gameversion.txt
--                                                                      4096 2017-12-05 20:04:00 platform/
--                                                                      4096 2017-12-05 20:04:00 platform/shaders/
--                                                                      4096 2017-12-05 20:04:00 platform/shaders/fxc/
-20bacdf741053ab77570e0e43387aee4a71e1c0153bd6c6644597705212cbd9d      12376 2017-11-29 13:21:08 platform/shaders/fxc/boxfilter_cs50.vcs
-f6ca9fd4579f25539b9741b41990c4656106505953f0673f7774d945b298993d       1124 2017-11-29 13:21:16 platform/shaders/fxc/visquery_ps40.vcs
 -                                                                      4096 2017-12-05 20:04:00 r2/
 8956fd053a30be003866cd3e7ebb3a6d94735906923201014026086599659daa        258 2017-11-29 13:21:16 r2/aidata.bin
 -                                                                      4096 2017-12-05 20:04:00 r2/cfg/
 -                                                                      4096 2017-12-05 20:04:00 r2/cfg/client/
 07044476e7f6d2ac1e239bb64b951216eb9deb0712c0cff6e2783b5911d0cc0b      88019 2017-12-05 17:27:04 r2/cfg/client/st_data.bin
 bd767c0c84bf5318728fd499527bbd8d8718f3d23b3696159772d199b7f42cc2       1320 2017-11-29 13:32:18 r2/cfg/config_default_pc.cfg
-4924aeae9c1463c4fd6b5f2a010fa9f0c646e6f75d3161b85f1334aa11002b92        314 2017-11-29 13:32:18 r2/cfg/cpu_level_1_pc.ekv
-bd47b2a882ce2f37520df18963cfd102100daafbe7b4acad60c216a20b58cd09        314 2017-11-29 13:32:18 r2/cfg/cpu_level_2_pc.ekv
-b1780cb8112d0a479abac6cad1d59c258253444ada1800d91ae77d902b344046        311 2017-11-29 13:32:18 r2/cfg/cpu_level_3_pc.ekv
-cba40e642938b9521216a1693d41820fe4a42f8f01c0f71b54bc983441eaa679        311 2017-11-29 13:32:18 r2/cfg/cpu_level_0_pc.ekv
-b580513a98042884242efe5f088e50adacbb204a59e901083a4d11c1046b45fa        414 2017-11-29 13:32:18 r2/cfg/gpu_level_1_pc.ekv
-b87f90c27532e9ec2d109df178b601f798d418e624444bd85d143f803115ba67        418 2017-11-29 13:32:18 r2/cfg/gpu_level_2_pc.ekv
-ab8ddb9445cc3102d1bb4df4176bc3f4df9cc009d0399d0c63065b9bfc9e08b0        414 2017-11-29 13:32:18 r2/cfg/gpu_level_3_pc.ekv
-bfe408437a31a75ee634e982235e43467fc55ed468cf0128ca6f7763b5f4fe8d        416 2017-11-29 13:32:18 r2/cfg/gpu_level_0_pc.ekv
-24c434284811ace4532829881e198caf7118bfc0396cd9aebd0bc96353b25f1c        132 2017-11-29 13:32:18 r2/cfg/gpu_mem_level_1_pc.ekv
-1ebb97153f77cfa803eff8b2bf2d77b29054b48f4b0c4b98a9f96483444778c7        132 2017-11-29 13:32:18 r2/cfg/gpu_mem_level_2_pc.ekv
-732f75134cfa0b051180b4a0dad7a3b1059ae2d1a4cb0850165904c7da3bd917        132 2017-11-29 13:32:18 r2/cfg/gpu_mem_level_3_pc.ekv
-9d48a0a9f15fcb27345223f786919d24f1ba102d4583cf0b0bb9b2a7a2d911c6        133 2017-11-29 13:32:18 r2/cfg/gpu_mem_level_4_pc.ekv
-d9a95b98d5216d9769cb2dcd13914be7b0a4c4b989ed60aa16484918c1a1ec02        132 2017-11-29 13:32:18 r2/cfg/gpu_mem_level_0_pc.ekv
-53f06a2114ab2f4d70eb32c1fa47c67282188bd3438abf69e86e9f6fc9a44e4b         87 2017-11-29 13:32:18 r2/cfg/mem_level_1_pc.ekv
-4db77c1397c4b38c62121cf747ff854e43b6e2aa0c1eb78bb6b7d7575cc0b61b         87 2017-11-29 13:32:18 r2/cfg/mem_level_2_pc.ekv
-db9e4bfa53d3b177bcd29b212b6c6f752c6a1bdd7e6201ef6c2ee746f65800eb         86 2017-11-29 13:32:18 r2/cfg/mem_level_3_pc.ekv
-4cc6ab038411cdf683c10aa90f7628d8617b996737eeb725e9dea8a5ab975e02         87 2017-11-29 13:32:18 r2/cfg/mem_level_0_pc.ekv
 8577da2ea54085708b3b851bc50315a36bb740ba5135e747cfb12457b5d3060f          4 2017-11-29 13:32:18 r2/cfg/video_settings_changed_quit.cfg
 5b27f13704d139c29bb2fa06ad6b043cb86da3be160704b0ddab8136df40ca4a       1511 2017-11-29 13:32:20 r2/GameInfo.txt
 -                                                                      4096 2017-12-05 20:04:00 r2/paks/
@@ -177,31 +157,6 @@ d0b05b1bf689123b53fbe832c7d396929dfa9d7d62ab78d4630e18e250e5093c      37176 2017
 6b7acb1be655a5b738a40375e29dceb8b33ed4adcde74e6df3c8861beddea83a      37176 2017-12-05 17:10:28 r2/paks/Win64/particle_scripts(11).rpak
 dc469e241e5098542599066012df28a71bebeb0cd61f3cf80234adf5e7c591c6     957132 2016-09-28 14:31:24 r2/paks/Win64/particle_scripts.rpak
 61f1c57ee628088ee62040347c56916b8f86e93e03c686f1f16f7d73156efeb1       2158 2017-12-05 17:24:22 r2/paks/Win64/patch_master.rpak
-fd9b2c323abaa5a547f8fa5b4d8dd2fe2669ad0186354ec231ed38378f6ef5de     650752 2016-11-22 15:32:22 r2/paks/Win64/ui(01).dll
-29d763d159ff8467b5fec3b7879dfe156bba51fd8a6b8ec699b640039b93a6ca   44394352 2016-11-22 15:32:20 r2/paks/Win64/ui(01).rpak
-2cbb358a71af84700bf1f5194e29898be68cc2532db28af6f8f567aa2208ead1       4104 2016-10-28 17:57:24 r2/paks/Win64/ui(01).starpak
-5a7b134027285132ae50baa3041a93d21a043dfb1223201aa0a245b7fa051bd3     703488 2017-02-11 02:52:52 r2/paks/Win64/ui(02).dll
-29c961e8349cab30ad89de03f04d056ea6825387f2b9cd4e2b91cd744c82b585   42897822 2017-02-11 02:52:50 r2/paks/Win64/ui(02).rpak
-230c63eff88448c93183ea06450c2735fb3cca9258e0a952adc38f0645e570fe     769024 2017-03-14 14:39:30 r2/paks/Win64/ui(03).dll
-c432bac074bcb3ed06e6da884fc07c3039a1a3601b91df3e2b039db548af224e   49799244 2017-03-14 14:39:28 r2/paks/Win64/ui(03).rpak
-8e146edf0dd4cdf5acbc99fd04ba3049fb281deab783f3e77b21d0da8eed5e06     817664 2017-04-12 16:22:22 r2/paks/Win64/ui(04).dll
-f02b7e4a2c887d0aced17df1bea5c1dc850e9ffa6370913c73b3eb88af0527aa   34685941 2017-04-12 16:22:18 r2/paks/Win64/ui(04).rpak
-0eb19e2870cdf22191d4730d18366ce715451e71bf65fc0cc13752ac10ad68e6     843264 2017-05-10 21:21:46 r2/paks/Win64/ui(05).dll
-cfd74e1b1a3aedc8c4a5451d061e68c6f8c110a3a8a73557c0f00ae18c9b8469   58109323 2017-05-10 21:21:42 r2/paks/Win64/ui(05).rpak
-f0ddc584963944036705f7c7c3aa4fb8fc7623bf7ebce96387db2e11ec69320c     899584 2017-06-23 18:23:20 r2/paks/Win64/ui(06).dll
-549cad8da6dda3f5d7eac18faf376e803e6d5366fb3b1c2eb79cce0d5f8b238c   26588742 2017-06-23 18:23:16 r2/paks/Win64/ui(06).rpak
-71b841f3846c0ab5cee5b67d79a70e5c110cdfa71ebc52a8d3c4faa466401e33     942592 2017-07-11 18:57:08 r2/paks/Win64/ui(07).dll
-9c306f67b9003805d59f5a1da419444e7714ac124d100be421f877dfb1f0e360   21701185 2017-07-11 18:57:04 r2/paks/Win64/ui(07).rpak
-9657cd5bb7755dcd8beb9a14c439c80c098a115b4a8f9d772cb08bab99d48115     944640 2017-08-11 14:31:46 r2/paks/Win64/ui(08).dll
-dc8563ae518d03320477f780712070db28d6f539023f31def943c231526e4165   21819001 2017-08-11 14:31:42 r2/paks/Win64/ui(08).rpak
-18f32450d59f0d6c87485cea2b7df382edc52a926b01f405dc374dfcef9eca35     945152 2017-10-17 14:21:16 r2/paks/Win64/ui(09).dll
-dbc92b036dabf5b63b68c9dd3e6ea2cc13fb0af647fc4bfdaa2e70c325920cf9    9838621 2017-10-17 14:21:12 r2/paks/Win64/ui(09).rpak
-4138549e3e399693a2c4bdbb38a7483feaa7f5255004be5d481feac6dc7bd6dd     945664 2017-11-16 16:49:10 r2/paks/Win64/ui(10).dll
-b769d64742fc10578d8bc6decdd16977685f71691fa651b5b0f4dc16e7046d0a    1583833 2017-11-16 16:49:06 r2/paks/Win64/ui(10).rpak
-ac211cf1b9452e998db88b6614feae7a1e13c6d37c84b247b00f5e4d1a74f135     945664 2017-12-05 17:10:10 r2/paks/Win64/ui(11).dll
-3e26172658f94b9853d41f6f0790a635b19fc3c8b9160e54a996d752f1a61b60    1584537 2017-12-05 17:10:06 r2/paks/Win64/ui(11).rpak
-49523abff88c059843696adb42bc80066cedb835ccbfe1ff5131c2fac323c391     590336 2016-09-28 14:31:24 r2/paks/Win64/ui.dll
-f54e68193b783f19f014878ef1a34b08b1a913c1392b89af3342fc781d2f29e0   42486310 2016-09-28 14:31:22 r2/paks/Win64/ui.rpak
 d8987197b67b50450a390e2b5cdf71c22d06b14ef09b063a4dc9d68d4d2b0cd3        258 2017-11-29 13:37:22 r2/pilotaidata.bin
 -                                                                      4096 2017-12-05 20:04:00 r2/sound/
 d7f48fb134fab750bac00faa25ec0e52dc54aba692debfe95f0011e17882f4d6     145880 2017-11-29 13:38:52 r2/sound/titanfall_2.mprj
@@ -479,7 +434,7 @@ Additional command-line arguments (including convars starting with `+`) can be p
 - **How do I get old logs after a crash?** <br/>
   With the default Docker configuration, if you add a name to the container and remove `--rm`, you will be able to used `docker logs` to view them. You can also use a log management solution like Loki (via promtail or the Docker driver). Consider adding `+spewlog_enable 0` to `NS_EXTRA_ARGUMENTS` to reduce the logspam.
 - **How can I optimize the server and reduce the bandwidth required for running it?** <br/>
-  Add `+net_compresspackets 1 +net_compresspackets_minsize 64 +net_encryptpackets 0 +sv_maxrate 127000` to `NS_EXTRA_ARGUMENTS`. The CPU overhead is neglegible.
+  Add `+net_compresspackets 1 +net_compresspackets_minsize 64 +sv_maxrate 127000` to `NS_EXTRA_ARGUMENTS`. The CPU overhead is neglegible.
 
 ### Deployment
 
@@ -507,7 +462,6 @@ services:
         +net_compresspackets_minsize 64
         +net_compresspackets 1
         +spewlog_enable 0
-        +net_encryptpackets 0
         +sv_maxrate 127000
     volumes:
       - /path/to/titanfall:/mnt/titanfall:ro
@@ -553,7 +507,6 @@ services:
         +net_compresspackets_minsize 64
         +net_compresspackets 1
         +spewlog_enable 0
-        +net_encryptpackets 0
         +sv_maxrate 127000
         +rcon_admin 1009497984978
         +grant_admin 1009497984978
