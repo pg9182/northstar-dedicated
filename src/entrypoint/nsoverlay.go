@@ -58,7 +58,6 @@ func (n *NSOverlay) mergeTF(p string) error {
 		"bin",
 		"r2",
 		"vpk",
-		"platform",
 		"build.txt",
 		"server.dll",
 	} {
