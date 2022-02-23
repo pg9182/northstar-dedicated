@@ -62,10 +62,11 @@ To slim down a Titanfall 2 install, delete the files as specified below.
 - delete `vpk/client_sp_* englishclient_sp_*`
 - delete `r2/maps`
 - delete `r2/cfg/*.ekv`
-- delete `r2/paks/` except for `{patch_master,{common,common_mp,highlight,particle_scripts}{,\(*}}.rpak`
+- delete `r2/paks/` except for `{patch_master,{common,common_mp}{,\(*}}.rpak`
 - delete `r2/sound/**`
 - delete `r2/media`
 - delete `r2/screenshots`
+- delete `bin/x64_retail/{client,auditionwin64}.dll`
 - delete `bin/dxsupport.cfg`
 - delete `platform`
 - on wine without origin installed:
@@ -79,10 +80,8 @@ To slim down a Titanfall 2 install, delete the files as specified below.
 -                                                                      4096 2017-12-05 20:04:00 bin/
 -                                                                      4096 2017-12-05 20:04:00 bin/x64_retail/
 37bf20436643db1e483fc44a20ff5ec50abaf0c6a863a2eafaac03e9e5cdbd27     109056 2017-11-29 13:20:56 bin/x64_retail/amd_ags_x64.dll
-a3b4007b945d6008c046b4c57b11414912cff892c9e69d9185e4a2824be8d2b0     197632 2017-11-29 13:20:48 bin/x64_retail/auditionwin64.dll
 2cd7762823e6e55039af31ba1c398867fc865dfbd68c4e87c19f5f7913e91281     423936 2017-11-29 13:20:56 bin/x64_retail/bink2w64.dll
 3fd8fa90f3a0945f08f129536f1f6249d25fdf6cf15b52e8aaf88bb63735252a     197120 2017-11-29 13:21:00 bin/x64_retail/binkawin64.dll
-002b36487fec7c98882929fbccdb506d0146bbf3270cbb964a4d21c5edf7eebc   13587968 2017-12-05 17:40:38 bin/x64_retail/client.dll
 b1a06f7aa52439a948a152bfd3301d9b595c78969bb77c9741bba935139f58a0    3873224 2017-11-29 13:20:56 bin/x64_retail/d3dcompiler_46.dll
 0fe9657e21b72ed5e8936f86220474cb25ccaedfc452c8942af7e791881c8df5     980480 2017-12-05 17:39:22 bin/x64_retail/datacache.dll
 58eb1a1b44b30275bdd21368de264d856bc310d37d93a0f76f111f0026913487    9843712 2017-12-05 17:40:02 bin/x64_retail/engine.dll
@@ -133,29 +132,6 @@ c8c28bbb57a8d799257c63f8a3cabd37ff2a61b57ceedf0a51c53c683d810448     229026 2017
 e362077c4e62d52ccb8f54dbd0b7581529dc63cfcf49e7b4009f8552440ce4c4      78282 2017-10-17 14:22:24 r2/paks/Win64/common_mp(09).rpak
 6237a8999383887477b9f5165c58c673360f1a20cb2992ab3e46d8d3d36cc93b      78282 2017-11-16 16:50:58 r2/paks/Win64/common_mp(10).rpak
 8ba444af8861ed442100de9549321647b459c38a620b46ea2350037fbf3507cd      94219 2017-12-05 17:12:16 r2/paks/Win64/common_mp(11).rpak
-8bf507a9d31a27ba5e8dfe2435df09ab758f0460cee0e44f9b0962173e0ac119      44260 2016-11-22 15:32:24 r2/paks/Win64/highlight(01).rpak
-2cbb358a71af84700bf1f5194e29898be68cc2532db28af6f8f567aa2208ead1       4104 2016-10-17 17:41:38 r2/paks/Win64/highlight(01).starpak
-c9c0058a77525aeb33efa960fef79f6964afd89b9a1acd2485288c425ccb1fca      43650 2017-02-11 02:52:54 r2/paks/Win64/highlight(02).rpak
-f6b7e563899250ba30294ad6272ae8b1319b123a6f75ab100a2b1ab2814f41b7     100622 2017-03-14 14:39:38 r2/paks/Win64/highlight(03).rpak
-358901ab3f8b05bac739f85cfdef4aecc40f328a69ec5a57a9f666ea538a5009      62242 2017-04-12 16:22:28 r2/paks/Win64/highlight(04).rpak
-b8a962acab466f8b49be72eb8e02ded34c72a706b304809b272fc4fe9ac9d68d      62242 2017-05-10 21:21:52 r2/paks/Win64/highlight(05).rpak
-baa4410dac652070481c32c0da5d432e8ff63a09fcebc4ec5eeebc19c2441935      66487 2017-06-23 18:23:40 r2/paks/Win64/highlight(06).rpak
-17f36d5d8b827f8d6bad65340a4cf4d7e740a7ab9c722f521c7befbd7352191c      23005 2017-07-11 18:58:02 r2/paks/Win64/highlight(07).rpak
-2ee3fed4f36fdec4cb54d7ed79df21e5d50e527922b700b57b5c6f44a4eed293      23005 2017-08-11 14:32:26 r2/paks/Win64/highlight(08).rpak
-50148cf63e7ac39f10b7ffc47bc3045f190c324a62b503f3f014a266aed3af87      23005 2017-10-17 14:21:48 r2/paks/Win64/highlight(09).rpak
-3d96eb53f0d9f5349ea36720ab8259fd29ed9590ae5497475c09ea7a68e1d8f7      23005 2017-11-16 16:49:54 r2/paks/Win64/highlight(10).rpak
-4234a47c3dc8d66025481ca037229cf3a9412595da11f9963d95b7c800a276dc      23005 2017-12-05 17:10:26 r2/paks/Win64/highlight(11).rpak
-0069876c12b6054850706852d15fed523c3db758273cbaaa271830e52286ddb6     130259 2016-09-28 14:31:24 r2/paks/Win64/highlight.rpak
-8c884af71e7421278baeb59d44b46cc27288c6a3a7cdd3f3fe2a3ea42eebd0f0      37192 2017-03-14 14:39:32 r2/paks/Win64/particle_scripts(03).rpak
-8a4ba5038d1e269a9f0b589acf266c7142f334e7e80051f3e7a09dd4098df00e      37192 2017-04-12 16:22:22 r2/paks/Win64/particle_scripts(04).rpak
-5c360614439ee8e070b61a9f80d4df2c4b430cde0760bc8e7941265d9765085a      37192 2017-05-10 21:21:48 r2/paks/Win64/particle_scripts(05).rpak
-528e8aeda8bb53139b6fbb6ca68a868a844d5b8992a3fda5d87a318414bf622d      37176 2017-06-23 18:23:40 r2/paks/Win64/particle_scripts(06).rpak
-c2901dee11fc234a21524ac917e9250e6eef06d54c60082359b4bd33af1d3a05      37176 2017-07-11 18:58:02 r2/paks/Win64/particle_scripts(07).rpak
-d1b21b12d5286a2bccd5c2722e092282d521c8a41d7d59b6506470878ea47e44      37176 2017-08-11 14:32:26 r2/paks/Win64/particle_scripts(08).rpak
-328095fe4f6c25d9907f77adfea76da44e5ded828e0097fdfa08a9f88508d917      37176 2017-10-17 14:21:48 r2/paks/Win64/particle_scripts(09).rpak
-d0b05b1bf689123b53fbe832c7d396929dfa9d7d62ab78d4630e18e250e5093c      37176 2017-11-16 16:49:54 r2/paks/Win64/particle_scripts(10).rpak
-6b7acb1be655a5b738a40375e29dceb8b33ed4adcde74e6df3c8861beddea83a      37176 2017-12-05 17:10:28 r2/paks/Win64/particle_scripts(11).rpak
-dc469e241e5098542599066012df28a71bebeb0cd61f3cf80234adf5e7c591c6     957132 2016-09-28 14:31:24 r2/paks/Win64/particle_scripts.rpak
 61f1c57ee628088ee62040347c56916b8f86e93e03c686f1f16f7d73156efeb1       2158 2017-12-05 17:24:22 r2/paks/Win64/patch_master.rpak
 d8987197b67b50450a390e2b5cdf71c22d06b14ef09b063a4dc9d68d4d2b0cd3        258 2017-11-29 13:37:22 r2/pilotaidata.bin
 -                                                                      4096 2017-12-05 20:04:00 r2/sound/
