@@ -385,7 +385,7 @@ ce7d7e926261d16f8deddc150d9e1e816a187e4c106616a3192bc0e2fd37baaf     119446 2017
 
 </details>
 
-TODO: It's possible to reduce it by at least another gigabyte by stripping textures and models from the VPKs.
+The size can be reduced even more (~2 GiB) by using my [`tf2-vpkoptim`](https://github.com/pg9182/tf2vpk) tool to repack the VPKs.
 
 ### Running with wine
 
