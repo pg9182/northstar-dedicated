@@ -1,6 +1,6 @@
 # Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
 pkgname=northstar
-pkgver=1.6.0-rc5
+pkgver=1.6.0
 pkgver_tf=2.0.11.0
 pkgrel=0
 pkgdesc="Northstar binaries and mods"
@@ -9,7 +9,7 @@ url="https://northstar.tf"
 license="MIT"
 
 arch="x86_64"
-source="https://cpdt.dev/files/Northstar.release.v${pkgver}.zip"
+source="https://cpdt.dev/files/Northstar.release.v1.6.0-rc5.zip"
 
 check() {
 	ls "$srcdir"
