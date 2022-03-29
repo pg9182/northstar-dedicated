@@ -1,6 +1,6 @@
 # Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
 pkgname=northstar
-pkgver=1.5.1
+pkgver=1.6.0-rc5
 pkgver_tf=2.0.11.0
 pkgrel=0
 pkgdesc="Northstar binaries and mods"
@@ -9,7 +9,7 @@ url="https://northstar.tf"
 license="MIT"
 
 arch="x86_64"
-source="https://github.com/R2Northstar/Northstar/releases/download/v${pkgver}/Northstar.release.v${pkgver}.zip"
+source="https://cpdt.dev/files/Northstar.release.v${pkgver}.zip"
 
 check() {
 	ls "$srcdir"
@@ -24,5 +24,5 @@ package() {
 	cp -r "$srcdir/." "$pkgdir/usr/lib/northstar/"
 }
 sha512sums="
-184346b29eff18e560a72c85918ac113c88576f1b7005200363116a7b5c6585f96e4321f44b17c7bb7f32c051ff7c53c5f0fc3d1ab43cb77d9279c695a0a1e03  Northstar.release.v1.5.1.zip
+4e1ae3ae836801fb02bc19336a45c8f93153c03d081fa916573e99cf5fd36de96dbfa41d2cf8e5a8cf77e45e6a723c63a574efdda891c265ef1efaf44460bdb2  Northstar.release.v1.6.0-rc5.zip
 "
