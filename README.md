@@ -488,7 +488,7 @@ x-logging:
 services:
   northstar1:
     << : *logging
-    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0-ns1.4.0
+    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0
     pull_policy: always
     environment:
       - NS_PORT=37015
