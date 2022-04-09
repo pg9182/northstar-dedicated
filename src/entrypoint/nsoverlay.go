@@ -11,7 +11,7 @@ type NSOverlay struct {
 	Path string
 }
 
-func MergeOverlay(dir, tfPath, nsPath, stubsPath, modsPath string) (*NSOverlay, error) {
+func MergeOverlay(dir, tfPath, nsPath, modsPath string) (*NSOverlay, error) {
 	n := new(NSOverlay)
 	if p, err := os.MkdirTemp(dir, "ns*"); err != nil {
 		return nil, fmt.Errorf("create temp dir in %q: %w", dir, err)
@@ -25,10 +25,6 @@ func MergeOverlay(dir, tfPath, nsPath, stubsPath, modsPath string) (*NSOverlay, 
 	if err := n.mergeNS(nsPath); err != nil {
 		n.Delete()
 		return nil, fmt.Errorf("merge northstar: %w", err)
-	}
-	if err := n.mergeStubs(stubsPath); err != nil {
-		n.Delete()
-		return nil, fmt.Errorf("merge northstar-stubs: %w", err)
 	}
 	if err := n.mergeMods(modsPath); err != nil {
 		n.Delete()
@@ -55,7 +51,7 @@ func (n *NSOverlay) Autoexec() string {
 
 func (n *NSOverlay) mergeTF(p string) error {
 	for _, x := range []string{
-		"bin",
+		"bin/x64_retail",
 		"r2",
 		"vpk",
 		"build.txt",
@@ -74,6 +70,15 @@ func (n *NSOverlay) mergeTF(p string) error {
 }
 
 func (n *NSOverlay) mergeNS(p string) error {
+	for _, x := range []string{
+		"bin/x64_dedi/d3d11.dll",
+		"bin/x64_dedi/GFSDK_SSAO.win64.dll",
+		"bin/x64_dedi/GFSDK_TXAA.win64.dll",
+	} {
+		if _, err := os.Stat(filepath.Join(p, x)); err != nil {
+			return fmt.Errorf("northstar build missing stubs (is it 1.6 or newer?): %w", err)
+		}
+	}
 	// ns wants to write into it's directory, and it also doesn't seem to work
 	// properly if it's dir is symlinked...
 	return filepath.Walk(p, func(path string, info fs.FileInfo, err error) error {
@@ -90,19 +95,6 @@ func (n *NSOverlay) mergeNS(p string) error {
 			return checkedSymlink(path, filepath.Join(n.Path, r))
 		}
 	})
-}
-
-func (n *NSOverlay) mergeStubs(p string) error {
-	for _, x := range []string{
-		"d3d11.dll",
-		"GFSDK_SSAO.win64.dll",
-		"GFSDK_TXAA.win64.dll",
-	} {
-		if err := checkedSymlink(filepath.Join(p, x), filepath.Join(n.Path, x)); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (n *NSOverlay) mergeMods(p string) error {

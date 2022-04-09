@@ -15,11 +15,12 @@ check() {
 	ls "$srcdir"
 	test -f "$srcdir/NorthstarLauncher.exe"
 	test -f "$srcdir/R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg"
+	test -f "$srcdir/bin/x64_dedi/d3d11.dll"
 }
 
 package() {
 	rm "$srcdir"/*.zip
-	rm -rf "$srcdir/bin"
+	rm -rf "$srcdir/bin/x64_retail"
 	mkdir -p "$pkgdir/usr/lib/northstar"
 	cp -r "$srcdir/." "$pkgdir/usr/lib/northstar/"
 }
