@@ -1147,7 +1147,7 @@ int main(int argc, char **argv) {
     const char *nswrap_title = getenv("NSWRAP_TITLE");
     if (nswrap_title) {
         if (*nswrap_title) {
-            sznprintf(argv[0], argv_len, "northstar {%s}", nswrap_title);
+            sznprintf(argv[0], argv_len, "northstar %s", nswrap_title);
         }
     } else {
         sznprintf(argv[0], argv_len, "northstar");
@@ -1263,7 +1263,7 @@ int main(int argc, char **argv) {
                                 st_shown_title_warning = true;
                             }
                             if (nswrap_title) {
-                                sznprintf(argv[0], argv_len, "northstar {%s}", nswrap_title);
+                                sznprintf(argv[0], argv_len, "northstar %s", nswrap_title);
                             } else {
                                 sznprintf(argv[0], argv_len, "northstar");
                             }
@@ -1271,7 +1271,7 @@ int main(int argc, char **argv) {
                             char sts[512];
                             ns_status_str(&st, sts, sizeof(sts));
                             if (nswrap_title) {
-                                sznprintf(argv[0], argv_len, "northstar {%s} [%s]", nswrap_title, sts);
+                                sznprintf(argv[0], argv_len, "northstar %s [%s]", nswrap_title, sts);
                             } else {
                                 sznprintf(argv[0], argv_len, "northstar [%s]", sts);
                             }
