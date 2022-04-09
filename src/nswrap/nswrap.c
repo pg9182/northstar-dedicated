@@ -21,6 +21,7 @@
 #include <sched.h>
 #include <signal.h>
 #include <stdatomic.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -99,6 +100,18 @@ static int nprocs(void) {
     CPU_ZERO(&cs);
     sched_getaffinity(0, sizeof(cs), &cs);
     return CPU_COUNT(&cs) < c ? CPU_COUNT(&cs) : c;
+}
+
+/** snprintf, but extends null bytes to the full length */
+static __attribute__ ((__format__ (__printf__, 3, 4))) int sznprintf(char *s, size_t n, const char *fmt, ...) {
+    va_list a;
+    va_start(a, fmt);
+    int r = vsnprintf(s, n, fmt, a);
+    if (r > 0) {
+        memset(s+r, '\0', n-r);
+    }
+    va_end(a);
+    return r;
 }
 
 /** The current status of a Northstar server */
@@ -1134,10 +1147,10 @@ int main(int argc, char **argv) {
     const char *nswrap_title = getenv("NSWRAP_TITLE");
     if (nswrap_title) {
         if (*nswrap_title) {
-            snprintf(argv[0], argv_len, "northstar {%s}", nswrap_title);
+            sznprintf(argv[0], argv_len, "northstar {%s}", nswrap_title);
         }
     } else {
-        snprintf(argv[0], argv_len, "northstar");
+        sznprintf(argv[0], argv_len, "northstar");
     }
 
     bool st_exiting = false;
@@ -1250,17 +1263,17 @@ int main(int argc, char **argv) {
                                 st_shown_title_warning = true;
                             }
                             if (nswrap_title) {
-                                snprintf(argv[0], argv_len, "northstar {%s}", nswrap_title);
+                                sznprintf(argv[0], argv_len, "northstar {%s}", nswrap_title);
                             } else {
-                                snprintf(argv[0], argv_len, "northstar");
+                                sznprintf(argv[0], argv_len, "northstar");
                             }
                         } else {
                             char sts[512];
                             ns_status_str(&st, sts, sizeof(sts));
                             if (nswrap_title) {
-                                snprintf(argv[0], argv_len, "northstar {%s} [%s]", nswrap_title, sts);
+                                sznprintf(argv[0], argv_len, "northstar {%s} [%s]", nswrap_title, sts);
                             } else {
-                                snprintf(argv[0], argv_len, "northstar [%s]", sts);
+                                sznprintf(argv[0], argv_len, "northstar [%s]", sts);
                             }
                             st_shown_title_warning = false;
                         }
