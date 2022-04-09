@@ -35,7 +35,7 @@ RUN --mount=from=build-entrypoint,source=/nsbuild/packages/main/x86_64,target=/n
 
 RUN adduser -D northstar && \
     echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
-    mkdir /mnt/titanfall /mnt/mods
+    mkdir /mnt/titanfall /mnt/mods /mnt/navs
 USER northstar
 
 RUN /usr/libexec/nsdedi __wineprefix__ && \
