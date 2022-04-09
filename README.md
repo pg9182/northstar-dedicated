@@ -362,9 +362,9 @@ popd
 make -C wine-build install DESTDIR=$PWD/wine-pkg</pre></code>
 </details></li>
 </ul></li>
-<li>X11 (so DirectX context creation doesn't fail) (Xvfb won't usually work for a few reasons unless you compile and use my d3d11 + gfsdk stubs instead of the options below)</li>
+<li>X11 (so DirectX context creation doesn't fail) (Xvfb won't usually work for a few reasons unless you compile and use my d3d11 + gfsdk stubs or are on Northstar 1.6.0+ (which includes them) instead of the options below)</li>
 <li>Titanfall 2 (just copied game files, no need to install)</li>
-<li>Northstar 1.1.2</li>
+<li>Northstar 1.1.2+</li>
 <li>Mesa 21.3.2 (distro packages)</li>
 <li><code>WINEARCH=win64</code></li>
 <li><code>WINEDEBUG=-all</code></li>

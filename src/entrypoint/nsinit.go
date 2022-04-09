@@ -69,7 +69,6 @@ func main() {
 		"/tmp",
 		"/mnt/titanfall",
 		"/usr/lib/northstar",
-		"/usr/lib/northstar-stubs",
 		"/mnt/mods",
 	)
 	if err != nil {

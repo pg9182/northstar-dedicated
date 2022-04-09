@@ -16,10 +16,6 @@ FROM build AS build-wine
 COPY --chown=nsbuild:nsbuild ./wine/ /nsbuild/src/main/wine/
 RUN ulimit -n 1024; cd /nsbuild/src/main/wine && abuild -r
 
-FROM build AS build-stubs
-COPY --chown=nsbuild:nsbuild ./stubs/ /nsbuild/src/main/stubs/
-RUN ulimit -n 1024; cd /nsbuild/src/main/stubs && abuild -r
-
 FROM build AS build-northstar
 COPY --chown=nsbuild:nsbuild ./northstar/ /nsbuild/src/main/northstar/
 RUN ulimit -n 1024; cd /nsbuild/src/main/northstar && abuild -r
@@ -36,8 +32,6 @@ FROM base
 RUN apk add --no-cache gnutls tzdata ca-certificates sudo
 RUN --mount=from=build-wine,source=/nsbuild/packages/main/x86_64,target=/nsbuild/wine \
     apk add --no-cache --allow-untrusted /nsbuild/wine/northstar-dedicated-wine-[0-9]*-r*.apk xvfb
-RUN --mount=from=build-stubs,source=/nsbuild/packages/main/x86_64,target=/nsbuild/stubs \
-    apk add --no-cache --allow-untrusted /nsbuild/stubs/*.apk
 RUN --mount=from=build-northstar,source=/nsbuild/packages/main/x86_64,target=/nsbuild/northstar \
     apk add --no-cache --allow-untrusted /nsbuild/northstar/*.apk
 RUN --mount=from=build-nswrap,source=/nsbuild/packages/main/x86_64,target=/nsbuild/nswrap \
