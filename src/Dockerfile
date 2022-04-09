@@ -40,7 +40,7 @@ RUN --mount=from=build-nswrap,source=/nsbuild/packages/main/x86_64,target=/nsbui
 
 RUN adduser -D northstar && \
     echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
-    mkdir /mnt/titanfall /mnt/mods
+    mkdir /mnt/titanfall /mnt/mods /mnt/navs
 USER northstar
 
 ENV WINEPREFIX="/home/northstar/.wine"

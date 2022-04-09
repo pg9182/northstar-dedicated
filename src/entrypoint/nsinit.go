@@ -70,6 +70,7 @@ func main() {
 		"/mnt/titanfall",
 		"/usr/lib/northstar",
 		"/mnt/mods",
+		"/mnt/navs",
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Failed to merge game files: %v.\n", err)

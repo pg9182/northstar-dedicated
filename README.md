@@ -407,6 +407,10 @@ Titanfall 2 is not included in the container image for size and legal reasons. T
 
 To include additional mods, mount them under `/mnt/mods/`, which is equivalent to the `R2Northstar/mods` folder (preferably read-only unless you know what you are doing).
 
+#### Navs
+
+To enable AI and auto-titans, navmeshes and graphs should be mounted to `/mnt/navs/` or a subdirectory. Prebuilt nav files can be found [here](https://github.com/taskinoz/Northstar-Navs). If a file conflicts with one already added, it will be overridden (in lexical order).
+
 #### Environment variables
 
 The following environment variables are mapped to convars or command-line arguments as necessary and will continue to be supported in releases of the image with the same major version. The default values are based on official Northstar releases and can be found in [nsinit.go](./src/entrypoint/nsinit.go).
@@ -488,7 +492,7 @@ x-logging:
 services:
   northstar1:
     << : *logging
-    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0-ns1.4.0
+    image: ghcr.io/pg9182/northstar-dedicated:1-tf2.0.11.0-ns1.6.1
     pull_policy: always
     environment:
       - NS_PORT=37015
@@ -514,6 +518,7 @@ services:
         +autoannounce "map console (`) commands: !skip to vote skip, !extend to vote extend"
     volumes:
       - ./titanfall/2.0.11.0-dedicated-mp:/mnt/titanfall:ro
+      - ./navs:/mnt/navs:ro
       - ./mods/RCON:/mnt/mods/RCON:ro
       - ./mods/Karma.Abuse:/mnt/mods/Karma.Abuse:ro
       - ./mods/Takyon.PlayerVote:/mnt/mods/Takyon.PlayerVote:ro
