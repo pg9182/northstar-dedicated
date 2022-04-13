@@ -1,9 +1,12 @@
 /**
- * Linux wrapper for the Northstar dedicated server. Requires Linux 5.3+. The caller must manage the WINEPREFIX; only
- * the NorthstarLauncher.exe process itself is managed. Tested on Wine 7.0+, but pg9182's patched Wine build should be
- * used if possible. Requires an assembled Northstar v1.4.0+ game dir, preferably with pg9182's d3d11 and gfsdk stubs.
- * Currently requires Xvfb, even though no window is shown. If the stubs aren't used, a full X11 server and graphics is
- * required.
+ * Linux wrapper for the Northstar dedicated server.
+ *
+ * - Requires Linux 3.4+, but 5.3+ is recommended.
+ * - The caller must manage the WINEPREFIX; only wine/NorthstarLauncher/Xvfb is managed.
+ * - Tested on vanilla Wine 7.0, but pg9182's patched Wine build should be used if possible.
+ * - Currently requires X11, even though no window is shown. If the stubs aren't used, a full X11
+ *   server and graphics is required.
+ * - Requires an assembled Northstar v1.4.0+ game dir, preferably with pg9182's d3d11 and gfsdk stubs.
  */
 
 #define _GNU_SOURCE
@@ -38,7 +41,6 @@
 #include <sys/timerfd.h>
 #include <sys/types.h>
 #include <sys/signalfd.h>
-#include <sys/syscall.h>
 #include <sys/sysinfo.h>
 #include <sys/wait.h>
 
@@ -102,13 +104,32 @@ static int nprocs(void) {
     return CPU_COUNT(&cs) < c ? CPU_COUNT(&cs) : c;
 }
 
-/** snprintf, but extends null bytes to the full length */
-static __attribute__ ((__format__ (__printf__, 3, 4))) int sznprintf(char *s, size_t n, const char *fmt, ...) {
+/** Replace the process cmdline. It must be initialized by calling it with a NULL fmt first. */
+static __attribute__ ((__format__ (__printf__, 2, 3))) int setproctitle(char **argv, const char *fmt, ...) {
+    // https://github.com/torvalds/linux/commit/d26d0cd97c88eb1a5704b42e41ab443406807810
+    // https://source.chromium.org/chromium/chromium/src/+/master:content/common/set_process_title_linux.cc
+
+    static int argv_len = 0;
+    if (!fmt) {
+        for (char **x = argv; *x; x++) {
+            if (*x != *argv + argv_len) {
+                // next arg is not consecutive, so stop here
+                break;
+            }
+            argv_len += strlen(*x) + 1;
+        }
+        return argv_len;
+    }
+
     va_list a;
     va_start(a, fmt);
-    int r = vsnprintf(s, n, fmt, a);
-    if (r > 0) {
-        memset(s+r, '\0', n-r);
+    int r = vsnprintf(*argv, argv_len, fmt, a);
+    for (char *x = *argv; x < *argv + argv_len; x++) {
+        if (x == *argv + argv_len-1) {
+            *x = '.';
+        } else if (x >= *argv + r || x == *argv + argv_len-2) {
+            *x = '\0';
+        }
     }
     va_end(a);
     return r;
@@ -178,41 +199,49 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
         return -1;
     }
 
-    int pidfd = syscall(SYS_pidfd_open, pid);
-    if (pidfd == -1 && errno != EINVAL) {
-        xvfb_err(errno, {
-            close(timerfd);
-            close(displayfd[0]);
-            kill(pid, SIGKILL);
-        }, "pidfd_open: %m");
-        return -1;
-    }
-
     struct pollfd pfd[] = {
         { .fd = displayfd[0], .events = POLLIN },
         { .fd = timerfd, .events = POLLIN },
-        { .fd = pidfd, .events = POLLIN }, // note: must be after displayfd to handle the exec errno correctly
     };
 
-    int nfd = sizeof(pfd)/sizeof(*pfd);
-    if (pidfd == -1) {
-        nfd--;
-    }
-
     for (;;) {
-        if (poll(pfd, nfd, -1) == -1) {
+        switch (poll(pfd, sizeof(pfd)/sizeof(*pfd), 100)) {
+        case -1:
             if (errno == EINTR) {
                 continue;
             }
             preserve_errno({
                 close(displayfd[0]);
                 close(timerfd);
-                close(pidfd);
                 kill(pid, SIGKILL);
             });
             return -1;
+        case 0:
+            if (kill(pid, 0) == -1 && errno == ESRCH) {
+                int st;
+                if (waitpid(pid, &st, WNOHANG) == -1) {
+                    xvfb_err(errno, {
+                        close(displayfd[0]);
+                        close(timerfd);
+                    }, "xvfb exited, but failed to get status (%m)");
+                    return -1;
+                }
+                if (WIFSIGNALED(st)) {
+                    xvfb_err(EIO, {
+                        close(displayfd[0]);
+                        close(timerfd);
+                    }, "xvfb killed with signal %d", WTERMSIG(st));
+                } else {
+                    xvfb_err(EIO, {
+                        close(displayfd[0]);
+                        close(timerfd);
+                    }, "xvfb exited with status %d", WEXITSTATUS(st));
+                }
+                return -1;
+            }
+            continue;
         }
-        for (int i = 0; i < nfd; i++) {
+        for (size_t i = 0; i < sizeof(pfd)/sizeof(*pfd); i++) {
             if (pfd[i].revents & POLLIN) {
                 if (pfd[i].fd == displayfd[0]) {
                     ssize_t n;
@@ -221,7 +250,6 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
                         xvfb_err(errno, {
                             close(displayfd[0]);
                             close(timerfd);
-                            close(pidfd);
                             kill(pid, SIGKILL);
                         }, "read displayfd: %m");
                         return -1;
@@ -239,7 +267,6 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
                         xvfb_err(EPROTO, {
                             close(displayfd[0]);
                             close(timerfd);
-                            close(pidfd);
                             kill(pid, SIGKILL);
                         }, "parse displayfd (%.*s): %m", (int)(n), buf);
                         return -1;
@@ -249,7 +276,6 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
                         xvfb_err(x, {
                             close(displayfd[0]);
                             close(timerfd);
-                            close(pidfd);
                             kill(pid, SIGKILL);
                         }, "execvp Xvfb: %m");
                         return -1;
@@ -260,36 +286,10 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
                     }
                     return x;
                 }
-                if (pfd[i].fd == pidfd) {
-                    int st;
-                    if (waitpid(pid, &st, WNOHANG) == -1) {
-                        xvfb_err(errno, {
-                            close(displayfd[0]);
-                            close(timerfd);
-                            close(pidfd);
-                        }, "xvfb exited, but failed to get status (%m)");
-                        return -1;
-                    }
-                    if (WIFSIGNALED(st)) {
-                        xvfb_err(EIO, {
-                            close(displayfd[0]);
-                            close(timerfd);
-                            close(pidfd);
-                        }, "xvfb killed with signal %d", WTERMSIG(st));
-                    } else {
-                        xvfb_err(EIO, {
-                            close(displayfd[0]);
-                            close(timerfd);
-                            close(pidfd);
-                        }, "xvfb exited with status %d", WEXITSTATUS(st));
-                    }
-                    return -1;
-                }
                 if (pfd[i].fd == timerfd) {
                     xvfb_err(errno, {
                         close(displayfd[0]);
                         close(timerfd);
-                        close(pidfd);
                         kill(pid, SIGKILL);
                     }, "xvfb didn't initialize within %lds", (long)(timeout.tv_sec));
                     return -1;
@@ -1110,47 +1110,21 @@ int main(int argc, char **argv) {
         _exit(127);
     }
 
-    int fd_pidfd_wine = syscall(SYS_pidfd_open, wine_pid);
-    if (fd_pidfd_wine == -1) {
-        ns_perror("error: failed to create pidfd for process %ld", (long) (wine_pid));
-        kill(wine_pid, SIGKILL);
-        return 1;
-    }
-
-    if (epoll_ctl(fd_epoll, EPOLL_CTL_ADD, fd_pidfd_wine, &(struct epoll_event) {
-        .events  = EPOLLIN,
-        .data.fd = fd_pidfd_wine,
-    })) {
-        ns_perror("error: failed to add wine pidfd to epoll");
-        kill(wine_pid, SIGKILL);
-        return 1;
-    }
-
     if (sigprocmask(SIG_BLOCK, &mask, NULL) == -1) {
         ns_perror("error: failed to register signal handlers: mask signals");
         kill(wine_pid, SIGKILL);
         return 1;
     }
 
-    // https://github.com/torvalds/linux/commit/d26d0cd97c88eb1a5704b42e41ab443406807810
-    // https://source.chromium.org/chromium/chromium/src/+/master:content/common/set_process_title_linux.cc
-    size_t argv_len = 0;
-    for (char **x = argv; *x; x++) {
-        if (*x != *argv + argv_len) {
-            ns_log("warning: argv is not consecutive; process name update will be limited to %zu bytes", argv_len);
-            break;
-        }
-        argv_len += strlen(*x) + 1;
-    }
-    *(argv[0] + --argv_len) = '.';
+    setproctitle(argv, NULL);
 
     const char *nswrap_title = getenv("NSWRAP_TITLE");
     if (nswrap_title) {
         if (*nswrap_title) {
-            sznprintf(argv[0], argv_len, "northstar %s", nswrap_title);
+            setproctitle(argv, "northstar %s", nswrap_title);
         }
     } else {
-        sznprintf(argv[0], argv_len, "northstar");
+        setproctitle(argv, "northstar");
     }
 
     bool st_exiting = false;
@@ -1197,9 +1171,24 @@ int main(int argc, char **argv) {
                 }
                 break;
             case SIGCHLD:
-                if ((pid_t)(siginfo.ssi_pid) != wine_pid) {
-                    waitpid(siginfo.ssi_pid, NULL, WNOHANG);
-                    //ns_log("debug: reaped child %ld", (long) (siginfo.ssi_pid));
+                if (siginfo.ssi_code == CLD_EXITED || siginfo.ssi_code == CLD_KILLED || siginfo.ssi_code == CLD_DUMPED) {
+                    if ((pid_t)(siginfo.ssi_pid) == wine_pid) {
+                        // note: the process will be reaped later
+                        goto cleanup;
+                    } else if ((pid_t)(siginfo.ssi_pid) == xvfb_pid) {
+                        if (siginfo.ssi_code == CLD_EXITED) {
+                            ns_log("warning: xvfb terminated: exited with status %d", siginfo.ssi_status);
+                        } else if (siginfo.ssi_code == CLD_KILLED) {
+                            ns_log("warning: xvfb terminated: killed by signal %d", siginfo.ssi_status);
+                        } else if (siginfo.ssi_code == CLD_DUMPED) {
+                            ns_log("warning: xvfb dumped core");
+                        }
+                        xvfb_pid = -1;
+                        waitpid(siginfo.ssi_pid, NULL, WNOHANG); // reap the process
+                    } else {
+                        waitpid(siginfo.ssi_pid, NULL, WNOHANG); // reap the process
+                        //ns_log("debug: reaped child %ld", (long) (siginfo.ssi_pid));
+                    }
                 }
                 break;
             default:
@@ -1263,17 +1252,17 @@ int main(int argc, char **argv) {
                                 st_shown_title_warning = true;
                             }
                             if (nswrap_title) {
-                                sznprintf(argv[0], argv_len, "northstar %s", nswrap_title);
+                                setproctitle(argv, "northstar %s", nswrap_title);
                             } else {
-                                sznprintf(argv[0], argv_len, "northstar");
+                                setproctitle(argv, "northstar");
                             }
                         } else {
                             char sts[512];
                             ns_status_str(&st, sts, sizeof(sts));
                             if (nswrap_title) {
-                                sznprintf(argv[0], argv_len, "northstar %s [%s]", nswrap_title, sts);
+                                setproctitle(argv, "northstar %s [%s]", nswrap_title, sts);
                             } else {
-                                sznprintf(argv[0], argv_len, "northstar [%s]", sts);
+                                setproctitle(argv, "northstar [%s]", sts);
                             }
                             st_shown_title_warning = false;
                         }
@@ -1285,10 +1274,6 @@ int main(int argc, char **argv) {
         }
         if (evt.data.fd == fd_timerfd_exit) {
             ns_log("warning: process did not exit in time; killing it");
-            goto cleanup;
-        }
-        if (evt.data.fd == fd_pidfd_wine) {
-            ns_log("wine exited");
             goto cleanup;
         }
         if (evt.data.fd == fd_pipe_errno[0]) {
@@ -1308,40 +1293,65 @@ cleanup:
     fflush(stdout);
     fflush(stderr);
 
-    // note: this won't affect anything if it's already exited or is a zombie
-    ns_log("cleaning up");
-    if (kill(wine_pid, SIGKILL)) {
-        if (errno != ESRCH) {
-            ns_log("warning: failed to send SIGKILL to pid %ld", (long) (wine_pid));
-        }
-    }
-
+    // get the wine exit status, but kill it first if it's still running
     siginfo_t siginfo = {};
-    if (waitid(P_PID, wine_pid, &siginfo, WEXITED|WNOHANG) == -1) {
-        ns_perror("error: failed to read northstar exit status from pipe");
-    } else if (siginfo.si_code == CLD_KILLED) {
-        ns_log("northstar killed by signal %d", siginfo.si_code);
-    } else if (siginfo.si_code == 127) {
-        ns_log("northstar failed to start");
-    } else {
-        ns_log("northstar exited with status %d", siginfo.si_code);
-    }
-
-    // give wine some time to stop the wineserver (the default timeout is 3s) (note: it won't if there's other applications using the prefix)
-    ns_log("waiting for wineserver to exit (but not forcing it to)");
-    sleep(4);
-
-    // reap any remaining processes
-    for (;;) {
-        siginfo = (siginfo_t){};
-        if (waitid(P_ALL, -1, &siginfo, WEXITED|WNOHANG) == -1) {
-            if (errno != EINTR) {
-                break;
-            }
-        } else if (siginfo.si_signo == 0) {
-            break;
+    if (waitid(P_PID, wine_pid, &siginfo, WEXITED|WNOHANG) == -1 && siginfo.si_pid == 0) {
+        ns_log("killing wine");
+        if (kill(wine_pid, SIGKILL) == -1) {
+            ns_perror("error: failed to kill wine");
         }
-        //ns_log("debug: reaped child %ld", (long)(pid));
+        if (waitid(P_PID, wine_pid, &siginfo, WEXITED|WNOHANG) == -1) {
+            ns_perror("error: failed to get northstar exit status");
+        }
     }
-    return 1;
+    if (siginfo.si_pid == 0) {
+        // this should never happen
+        ns_log("error: failed to get northstar exit status: did not exit even after killed");
+    } else if (siginfo.si_code == CLD_KILLED) {
+        ns_log("northstar killed by signal %d", siginfo.si_status);
+    } else if (siginfo.si_code == CLD_EXITED) {
+        if (siginfo.si_status == 127) {
+            ns_log("northstar failed to start");
+        } else {
+            ns_log("northstar exited with status %d", siginfo.si_status);
+        }
+    } else if (siginfo.si_code == CLD_DUMPED) {
+        ns_log("northstar dumped core");
+    }
+
+    // kill xvfb if it's still running
+    if (xvfb_pid != -1 && kill(xvfb_pid, 0) == 0 && errno != ESRCH) {
+        ns_log("killing xvfb");
+        kill(xvfb_pid, SIGKILL);
+        xvfb_pid = -1;
+    }
+
+    // the default wineserver timeout is 3s, so wait up to 5s for all children to exit
+    ns_log("waiting for children to exit");
+    struct timespec ts, tc;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    for (;;) {
+        switch (waitpid(-1, NULL, WNOHANG)) {
+        case -1:
+            if (errno != EINTR) {
+                if (errno != ECHILD) {
+                    ns_perror("error: failed to reap remaining children to exit");
+                }
+                return 1;
+            }
+            continue; // try again immediately
+        case 0:
+            clock_gettime(CLOCK_MONOTONIC, &tc);
+            if (tc.tv_sec - ts.tv_sec > 4) {
+                ns_log("warning: children did not exit in time");
+                return 1;
+            }
+            break; // no children to wait for
+        default:
+            continue; // child reaped; try another one immediately
+        }
+        nanosleep(&(struct timespec){
+            .tv_nsec = 100 * 1000 * 1000,
+        }, NULL);
+    }
 }
