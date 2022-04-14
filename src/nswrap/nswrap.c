@@ -1295,13 +1295,22 @@ cleanup:
 
     // get the wine exit status, but kill it first if it's still running
     siginfo_t siginfo = {};
-    if (waitid(P_PID, wine_pid, &siginfo, WEXITED|WNOHANG) == -1 && siginfo.si_pid == 0) {
+    if (waitid(P_PID, wine_pid, &siginfo, WEXITED|WNOHANG) == -1 || siginfo.si_pid == 0) {
         ns_log("killing wine");
         if (kill(wine_pid, SIGKILL) == -1) {
             ns_perror("error: failed to kill wine");
         }
-        if (waitid(P_PID, wine_pid, &siginfo, WEXITED|WNOHANG) == -1) {
-            ns_perror("error: failed to get northstar exit status");
+        for (int i = 0; siginfo.si_pid == 0; i++) {
+            if (i > 10) {
+                ns_perror("error: failed to get northstar exit status");
+                break;
+            }
+            if (waitid(P_PID, wine_pid, &siginfo, WEXITED|WNOHANG) == -1) {
+                break;
+            }
+            nanosleep(&(struct timespec){
+                .tv_nsec = 100 * 1000 * 1000,
+            }, NULL);
         }
     }
     if (siginfo.si_pid == 0) {
