@@ -900,25 +900,7 @@ int main(int argc, char **argv) {
         ns_log("note: optionally, it should also set HKLM\\System\\CurrentControlSet\\Services\\WineBus\\{DisableHidraw,DisableInput} to REG_DWORD:1 and HKCU\\Software\\Wine\\Drivers to REG_SZ:\"\"");
         ns_log("note: if pg9182's d3d11 and gfsdk stubs are used, set HKCU\\Software\\Wine\\DllOverrides\\d3d11 to REG_SZ:\"native\" and HKCU\\Software\\Wine\\DllOverrides\\{d3d9,d3d10,d3d12,wined3d,winevulkan} to REG_SZ:\"\"");
         ns_log("note: each instance of nswrap should have its own prefix (to save space, you can symlink files in system32), but it's not (currently) required");
-        /* Example:
-         * WINEARCH=win64 WINEDLLOVERRIDES="mscoree,mshtml,winemenubuilder.exe=" wineboot --init
-         * wine64 reg add /f 'HKCU\Software\Wine' /v 'Version' /t REG_SZ /d 'win10'
-         * wine64 reg add /f 'HKCU\Software\Wine\Drivers' /v 'Audio' /t REG_SZ /d ''
-         * wine64 reg add /f 'HKCU\Software\Wine\WineDbg' /v 'ShowCrashDialog' /t REG_DWORD /d 0
-         * wine64 reg add /f 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'DisableHidraw' /t REG_DWORD /d 1
-         * wine64 reg add /f 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'DisableInput' /t REG_DWORD /d 1
-         * wine64 reg add /f 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'Enable SDL' /t REG_DWORD /d 0
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'd3d11' /t REG_SZ /d 'native'
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'mscoree' /t REG_SZ /d ''
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'mshtml' /t REG_SZ /d ''
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'wined3d' /t REG_SZ /d ''
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'winevulkan' /t REG_SZ /d ''
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'd3d9' /t REG_SZ /d ''
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'd3d10' /t REG_SZ /d ''
-         * wine64 reg add /f 'HKCU\Software\Wine\DllOverrides' /v 'd3d12' /t REG_SZ /d ''
-         * wineboot --shutdown
-         * wineserver --wait
-         */
+        ns_log("note: you can use the nswrap-wineprefix script to set up a new wineprefix");
         return 1;
     }
 
