@@ -18,7 +18,6 @@ source="
 	nsconfig.go
 	nsinit.go
 	nsoverlay.go
-	nswine.go
 "
 sha512sums="$(sha512sum $source)"
 

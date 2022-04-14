@@ -22,25 +22,6 @@ func main() {
 		return
 	}
 
-	switch {
-	default:
-		fmt.Fprintf(os.Stderr, "This program is not intended to be run directly.\n")
-		// Technically, it could be run directly outside a container, but first,
-		// we'd need to allow the paths to be configured and initialize the
-		// wineprefix on startup
-		os.Exit(1)
-		return
-
-	case len(os.Args) == 2 && os.Args[1] == "__wineprefix__":
-		if err := InitPrefix(); err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to initialize and configure wineprefix.\n")
-			os.Exit(1)
-		}
-		return
-
-	case len(os.Args) == 1:
-	}
-
 	hostname, err := os.Hostname()
 	if err != nil {
 		if v := os.Getenv("HOSTNAME"); v != "" {

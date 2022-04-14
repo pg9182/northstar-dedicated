@@ -44,7 +44,7 @@ RUN adduser -D northstar && \
 USER northstar
 
 ENV WINEPREFIX="/home/northstar/.wine"
-RUN /usr/libexec/nsdedi __wineprefix__ && \
+RUN /usr/bin/nswrap-wineprefix && \
     for x in \
         /home/northstar/.wine/drive_c/"Program Files"/"Common Files"/System/*/* \
         /home/northstar/.wine/drive_c/windows/* \

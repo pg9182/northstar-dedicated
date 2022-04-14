@@ -1,0 +1,42 @@
+#!/bin/sh
+set -e
+
+if [ -z "$WINEPREFIX" ]; then
+    printf "nswrap-wineprefix: error: WINEPREFIX not set\n" >&2
+    exit 1
+fi
+
+
+if case "$WINEPREFIX" in /*) false ;; *) ;; esac; then
+    printf "nswrap-wineprefix: error: invalid WINEPREFIX '%s'\n" "$WINEPREFIX" >&2
+    exit 1
+fi
+
+if [ -n "$(ls -A "$WINEPREFIX" 2>/dev/null || true)" ]; then
+    printf "nswrap-wineprefix: error: WINEPREFIX '%s' is not empty\n" "$WINEPREFIX" >&2
+    exit 1
+fi
+
+unset DISPLAY
+export WINEARCH=win64
+export WINEDLLOVERRIDES="mscoree,mshtml,winemenubuilder.exe="
+
+set -x
+wine64 wineboot --init
+wine64 reg add 'HKCU\Software\Wine' /v 'Version' /t REG_SZ /d 'win10' /f
+wine64 reg add 'HKCU\Software\Wine\Drivers' /v 'Audio' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\WineDbg' /v 'ShowCrashDialog' /t REG_DWORD /d 0 /f
+wine64 reg add 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'DisableHidraw' /t REG_DWORD /d 1 /f
+wine64 reg add 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'DisableInput' /t REG_DWORD /d 1 /f
+wine64 reg add 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'Enable SDL' /t REG_DWORD /d 0 /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d11' /t REG_SZ /d 'native' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'mscoree' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'mshtml' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'wined3d' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'winevulkan' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'winemenubuilder' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d9' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d10' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d12' /t REG_SZ /d '' /f
+wine64 wineboot --shutdown
+wineserver --wait
