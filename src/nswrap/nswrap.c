@@ -284,6 +284,9 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
                     if (pid_out) {
                         *pid_out = pid;
                     }
+
+                    close(displayfd[0]);
+                    close(timerfd);
                     return x;
                 }
                 if (pfd[i].fd == timerfd) {
@@ -896,8 +899,8 @@ int main(int argc, char **argv) {
         } else {
             ns_perror("error: invalid WINEPREFIX '%s'", wineprefix);
         }
-        ns_log("note: the wineprefix must set HKCU\\Software\\Wine\\WineDbg to DWORD:0, and HKCU\\Software\\Wine\\DllOverrides\\{mscoree,mshtml} to REG_SZ:\"\"");
-        ns_log("note: optionally, it should also set HKLM\\System\\CurrentControlSet\\Services\\WineBus\\{DisableHidraw,DisableInput} to REG_DWORD:1 and HKCU\\Software\\Wine\\Drivers to REG_SZ:\"\"");
+        ns_log("note: the wineprefix must set HKCU\\Software\\Wine\\WineDbg\\ShowCrashDialog to DWORD:0, and HKCU\\Software\\Wine\\DllOverrides\\{mscoree,mshtml} to REG_SZ:\"\"");
+        ns_log("note: optionally, it should also set HKLM\\System\\CurrentControlSet\\Services\\WineBus\\{DisableHidraw,DisableInput} to REG_DWORD:1 and HKCU\\Software\\Wine\\Drivers\\Audio to REG_SZ:\"\"");
         ns_log("note: if pg9182's d3d11 and gfsdk stubs are used, set HKCU\\Software\\Wine\\DllOverrides\\d3d11 to REG_SZ:\"native\" and HKCU\\Software\\Wine\\DllOverrides\\{d3d9,d3d10,d3d12,wined3d,winevulkan} to REG_SZ:\"\"");
         ns_log("note: each instance of nswrap should have its own prefix (to save space, you can symlink files in system32), but it's not (currently) required");
         ns_log("note: you can use the nswrap-wineprefix script to set up a new wineprefix");
