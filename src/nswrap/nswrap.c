@@ -872,7 +872,7 @@ static const char *ns_watchdog_epoll_process(struct ns_watchdog *wd) {
 
 int main(int argc, char **argv) {
     if (argc <= 1) {
-        fprintf(stderr, "usage: %s game_dir [args...] [placeholder_whitespace]\n", argc ? argv[0] : "nswrap");
+        fprintf(stderr, "usage: %s game_dir [args...]\n", argc ? argv[0] : "nswrap");
         return 2;
     }
 
@@ -880,6 +880,26 @@ int main(int argc, char **argv) {
         ns_log("error: this program must not be run as root");
         return 1;
     }
+
+    // init setproctitle and attempt to ensure there is a placeholder arg consisting of spaces
+    for (const char *x = argv[argc - 1]; *x; x++) {
+        if (*x != ' ') {
+            char **nargv = alloca(argc + 2*sizeof(char*));
+            for (int i = 0; i < argc; i++) {
+                nargv[i] = argv[i];
+            }
+            nargv[argc] = "                                                                                                                                ";
+            nargv[argc+1] = NULL;
+            if (execve("/proc/self/exe", nargv, environ) == -1) {
+                ns_perror("warning: self-exec with additional space in argv for process title failed: execve");
+                argc++;
+            }
+            break;
+        }
+    }
+    argc--;
+    setproctitle(argv, NULL);
+    argv[argc] = NULL;
 
     if (chdir(argv[1])) {
         ns_perror("error: chdir '%s'", argv[1]);
@@ -1083,21 +1103,10 @@ int main(int argc, char **argv) {
     wine_argv[wine_argv_n++] = "NorthstarLauncher.exe";
     wine_argv[wine_argv_n++] = "-dedicated";
 
-    for (char **arg = &argv[2]; *arg; arg++) {
-        wine_argv[wine_argv_n++] = *arg;
+    for (int i = 2; i < argc; i++) {
+        wine_argv[wine_argv_n++] = argv[i];
     }
     wine_argv[wine_argv_n] = NULL;
-
-    bool sp = true;
-    for (const char *x = wine_argv[wine_argv_n - 1]; *x; x++) {
-        if (!isspace(*x)) {
-            sp = false;
-            break;
-        }
-    }
-    if (sp) {
-        wine_argv[--wine_argv_n] = NULL;
-    }
 
     char **wine_envp = (char *[]) {
         getenve("PATH") ?: "PATH=/usr/local/bin:/bin:/usr/bin",
@@ -1134,8 +1143,6 @@ int main(int argc, char **argv) {
         kill(wine_pid, SIGKILL);
         return 1;
     }
-
-    setproctitle(argv, NULL);
 
     const char *nswrap_title = getenv("NSWRAP_TITLE");
     if (nswrap_title) {
