@@ -1,0 +1,25 @@
+# Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
+pkgname=northstar-dedicated-nswrap
+pkgver=1
+pkgrel=0
+pkgdesc="Linux wrapper for the Northstar dedicated server"
+
+url="https://github.com/pg9182/northstar-dedicated"
+license="Zlib"
+
+arch="x86_64"
+
+options="!check"
+source="nswrap.c nswrap-wineprefix"
+sha512sums="$(sha512sum $source)"
+
+build() {
+	mkdir -p "$builddir"
+	gcc -Wall -Wextra -Werror -Wno-trampolines -std=gnu11 -O3 -DNSWRAP_HASH="$(sha256sum $source | head -c64)" "nswrap.c" -o "$builddir/nswrap"
+	cp "nswrap-wineprefix" "$builddir/nswrap-wineprefix"
+}
+
+package() {
+	install -Dm755 nswrap "$pkgdir/usr/bin/nswrap"
+	install -Dm755 nswrap-wineprefix "$pkgdir/usr/bin/nswrap-wineprefix"
+}

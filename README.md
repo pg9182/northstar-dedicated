@@ -50,6 +50,7 @@ To use this docker container, you will need a copy of the Titanfall 2 game files
 
 ### System requirements
 
+- **Kernel:** Linux 5.3+ is recommended for full functionality, but Linux 4.9+ should work for all essential functionality. Older versions may or may not work.
 - **CPU:** x86_64, at least 3 cores/threads (in the future, it will likely be able to run on 1).
 - **RAM:** 2GB (physical or swap) per instance (it typically peaks to ~1.6GB at launch then settles to around 1GB).
 - **Network:** A 16-player instance generally uses about 7-20 Mbps up (note that pilot game modes tend to use more bandwidth than titan-only ones) (this can be reduced significantly; see the FAQ at the bottom).

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
-	"reflect"
+	"os/exec"
+	"os/signal"
 	"runtime"
 	"strconv"
 	"strings"
-	"unsafe"
+	"syscall"
 
 	"github.com/kballard/go-shellquote"
 )
@@ -17,26 +20,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unsupported platform %s/%s.\n", runtime.GOOS, runtime.GOARCH)
 		os.Exit(1)
 		return
-	}
-
-	switch {
-	default:
-		fmt.Fprintf(os.Stderr, "This program is not intended to be run directly.\n")
-		// Technically, it could be run directly outside a container, but first,
-		// we'd need to allow the paths to be configured and initialize the
-		// wineprefix on startup
-		os.Exit(1)
-		return
-
-	case len(os.Args) == 2 && os.Args[1] == "__wineprefix__":
-		if err := InitPrefix(); err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to initialize and configure wineprefix.\n")
-			os.Exit(1)
-		}
-		return
-
-	case len(os.Args) == 2 && len(os.Args[1]) > 1 && strings.Trim(os.Args[1], " ") == "":
-		break
 	}
 
 	hostname, err := os.Hostname()
@@ -153,38 +136,80 @@ func main() {
 	nsc.Display(os.Stdout, "    ")
 	fmt.Println()
 
-	// This is needed since there's an issue with my current method of
-	// eliminating x11 by simply making CreateWindow and ShowWindow always
-	// successful in Wine's nulldrv. Apparently, it causes in-game time to slow
-	// down for some users. More testing will be required.
-	xvfb := 9
-
-	fmt.Println("Starting Northstar...")
-	sn, _ := nsc.Get("ns_server_name")
-	updatetitle(sn)
-	nsi, err := CreateInstance(nso, nsc, true)
+	var buf bytes.Buffer
+	args, err := nsc.Autoexec(&buf)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v.\n", err)
+		fmt.Fprintf(os.Stderr, "Error: generate autoexec: %v.\n", err)
 		os.Exit(1)
 		return
 	}
-	nsi.Output = os.Stdout
-	nsi.Xvfb = &xvfb
-	nsi.InfoCallback = func(ns NSInstanceStatus) {
-		updatetitle(sn + " [" + ns.String() + "]")
+	if err := os.WriteFile(nso.Autoexec(), buf.Bytes(), 0644); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: write autoexec: %v.\n", err)
+		os.Exit(1)
+		return
 	}
-	fmt.Fprintf(os.Stderr, "Error: Failed to run server: %v.\n", nsi.Run())
-	nsi.Close()
-	os.Exit(1)
+
+	fmt.Println("Starting Northstar...")
+
+	sn, _ := nsc.Get("ns_server_name")
+
+	cmd := &exec.Cmd{
+		Path: "/usr/bin/nswrap",
+		Args: append(append([]string{"nswrap", nso.Path}, args...), strings.Repeat(" ", 256)),
+		Env: env([]string{"PATH", "HOSTNAME", "HOME", "USER", "WINEPREFIX", "WINESERVER"},
+			"NSWRAP_TITLE", sn,
+			"DISPLAY", "xvfb",
+		),
+		Stdin:  os.Stdin,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+	}
+
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		for sig := range ch {
+			if cmd.Process != nil {
+				cmd.Process.Signal(sig)
+			}
+		}
+	}()
+
+	err = cmd.Run()
+
+	if err != nil {
+		var ex *exec.ExitError
+		if errors.As(err, &ex) {
+			os.Exit(ex.ExitCode())
+			return
+		}
+		fmt.Fprintf(os.Stderr, "Error: Failed to run northstar: %v.\n", err)
+		os.Exit(1)
+	}
 }
 
-func updatetitle(t string) {
-	// get access to the underlying data of the last arg
-	h := (*reflect.StringHeader)(unsafe.Pointer(&os.Args[1]))
-	d := (*[1 << 30]byte)(unsafe.Pointer(h.Data))[:h.Len] // not including the null terminator
-
-	// overwrite it
-	for n := copy(d, []byte(t)); n < len(d); n++ {
-		d[n] = 0 // fill the rest with nulls
+func env(preserve []string, override ...string) []string {
+	var r []string
+	if len(override)%2 != 0 {
+		panic("invalid env override")
 	}
+	for _, x := range os.Environ() {
+		spl := strings.SplitN(x, "=", 2)
+		for i := 0; i < len(override); i += 2 {
+			if override[i] == spl[0] {
+				continue
+			}
+		}
+		for _, p := range preserve {
+			if spl[0] == p {
+				r = append(r, x)
+				break
+			}
+		}
+	}
+	for i := 0; i < len(override); i += 2 {
+		r = append(r, override[i]+"="+override[i+1])
+	}
+	return r
 }

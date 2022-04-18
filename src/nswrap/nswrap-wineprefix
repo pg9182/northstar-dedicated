@@ -1,0 +1,73 @@
+#!/bin/sh
+set -e
+
+opt_keep_d3d11=0
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -d|--keep-d3d11)
+            opt_keep_d3d11=1
+            ;;
+        -h|--help)
+            printf "usage: %s [options]\n\n" "$0"
+            printf "options:\n"
+            printf "  -d, --keep-d3d11   enable native d3d11 libraries (use this if you aren't using the stubs)\n"
+            printf "  -h, --help         show this help text\n"
+            exit 1
+            ;;
+        *)
+            printf "nswrap-wineprefix: error: unknown option '%s'\n" "$1" >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$WINEPREFIX" ]; then
+    printf "nswrap-wineprefix: error: WINEPREFIX not set\n" >&2
+    exit 1
+fi
+
+if case "$WINEPREFIX" in /*) false ;; *) ;; esac; then
+    printf "nswrap-wineprefix: error: invalid WINEPREFIX '%s'\n" "$WINEPREFIX" >&2
+    exit 1
+fi
+
+if [ -n "$(ls -A "$WINEPREFIX" 2>/dev/null || true)" ]; then
+    printf "nswrap-wineprefix: error: WINEPREFIX '%s' is not empty\n" "$WINEPREFIX" >&2
+    exit 1
+fi
+
+set -x
+
+unset DISPLAY
+export WINEARCH=win64
+export WINEDLLOVERRIDES="mscoree,mshtml,winemenubuilder.exe="
+
+wine64 wineboot --init
+
+wine64 reg add 'HKCU\Software\Wine' /v 'Version' /t REG_SZ /d 'win10' /f
+wine64 reg add 'HKCU\Software\Wine\Drivers' /v 'Audio' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\WineDbg' /v 'ShowCrashDialog' /t REG_DWORD /d 0 /f
+
+wine64 reg add 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'DisableHidraw' /t REG_DWORD /d 1 /f
+wine64 reg add 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'DisableInput' /t REG_DWORD /d 1 /f
+wine64 reg add 'HKLM\System\CurrentControlSet\Services\WineBus' /v 'Enable SDL' /t REG_DWORD /d 0 /f
+
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'mscoree' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'mshtml' /t REG_SZ /d '' /f
+wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'winemenubuilder' /t REG_SZ /d '' /f
+
+if [ "$opt_keep_d3d11" = "1" ]; then
+    printf "nswrap-wineprefix: keeping d3d11 libraries\n" >&2
+else
+    wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d9' /t REG_SZ /d '' /f
+    wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d10' /t REG_SZ /d '' /f
+    wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d11' /t REG_SZ /d 'native' /f
+    wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'd3d12' /t REG_SZ /d '' /f
+    wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'wined3d' /t REG_SZ /d '' /f
+    wine64 reg add 'HKCU\Software\Wine\DllOverrides' /v 'winevulkan' /t REG_SZ /d '' /f
+fi
+
+wine64 wineboot --shutdown
+wineserver --wait

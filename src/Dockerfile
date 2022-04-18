@@ -20,6 +20,10 @@ FROM build AS build-northstar
 COPY --chown=nsbuild:nsbuild ./northstar/ /nsbuild/src/main/northstar/
 RUN ulimit -n 1024; cd /nsbuild/src/main/northstar && abuild -r
 
+FROM build AS build-nswrap
+COPY --chown=nsbuild:nsbuild ./nswrap/ /nsbuild/src/main/nswrap/
+RUN ulimit -n 1024; cd /nsbuild/src/main/nswrap && abuild -r
+
 FROM build AS build-entrypoint
 COPY --chown=nsbuild:nsbuild ./entrypoint/ /nsbuild/src/main/entrypoint/
 RUN ulimit -n 1024; cd /nsbuild/src/main/entrypoint && abuild -r
@@ -30,15 +34,17 @@ RUN --mount=from=build-wine,source=/nsbuild/packages/main/x86_64,target=/nsbuild
     apk add --no-cache --allow-untrusted /nsbuild/wine/northstar-dedicated-wine-[0-9]*-r*.apk xvfb
 RUN --mount=from=build-northstar,source=/nsbuild/packages/main/x86_64,target=/nsbuild/northstar \
     apk add --no-cache --allow-untrusted /nsbuild/northstar/*.apk
-RUN --mount=from=build-entrypoint,source=/nsbuild/packages/main/x86_64,target=/nsbuild/entrypoint \
-    apk add --no-cache --allow-untrusted /nsbuild/entrypoint/*.apk
+RUN --mount=from=build-nswrap,source=/nsbuild/packages/main/x86_64,target=/nsbuild/nswrap \
+    --mount=from=build-entrypoint,source=/nsbuild/packages/main/x86_64,target=/nsbuild/entrypoint \
+    apk add --no-cache --allow-untrusted /nsbuild/nswrap/*.apk /nsbuild/entrypoint/*.apk
 
 RUN adduser -D northstar && \
     echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
     mkdir /mnt/titanfall /mnt/mods /mnt/navs
 USER northstar
 
-RUN /usr/libexec/nsdedi __wineprefix__ && \
+ENV WINEPREFIX="/home/northstar/.wine"
+RUN /usr/bin/nswrap-wineprefix && \
     for x in \
         /home/northstar/.wine/drive_c/"Program Files"/"Common Files"/System/*/* \
         /home/northstar/.wine/drive_c/windows/* \
@@ -61,4 +67,4 @@ RUN /usr/libexec/nsdedi __wineprefix__ && \
     done
 EXPOSE 8081/tcp
 EXPOSE 37015/udp
-ENTRYPOINT ["/usr/libexec/nsdedi", "                                                                                                                        "]
+ENTRYPOINT ["/usr/libexec/nsdedi"]

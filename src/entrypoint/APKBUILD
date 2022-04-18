@@ -9,7 +9,7 @@ license="Zlib"
 
 arch="x86_64"
 makedepends="go"
-# commenting this out so we can build it separately: depends="northstar northstar-dedicated-wine xvfb"
+# commenting this out so we can build it separately: depends="northstar northstar-dedicated-nswrap northstar-dedicated-wine xvfb"
 
 options="!check"
 source="
@@ -17,10 +17,7 @@ source="
 	go.sum
 	nsconfig.go
 	nsinit.go
-	nsinstance.go
 	nsoverlay.go
-	nswine.go
-	termios.go
 "
 sha512sums="$(sha512sum $source)"
 
