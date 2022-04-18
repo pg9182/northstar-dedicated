@@ -281,7 +281,7 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
                         }, "execvp Xvfb: %m");
                         return -1;
                     }
-                    
+
                     if (pid_out) {
                         *pid_out = pid;
                     }
