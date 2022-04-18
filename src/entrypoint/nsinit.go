@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -46,6 +47,21 @@ func main() {
 	fmt.Println()
 
 	fmt.Println("Merging files...")
+	if pts, err := mounts("/mnt", "/usr"); err == nil {
+		fmt.Println()
+		fmt.Println("    Bind mounts:")
+		var unsupported bool
+		for _, pt := range pts {
+			fmt.Printf("        %s\n", pt)
+			if strings.HasPrefix(pt, "/usr") {
+				unsupported = true
+			}
+		}
+		if unsupported {
+			fmt.Println()
+			fmt.Println("    Warning: You have overridden internal files. This may break without warning in future versions.")
+		}
+	}
 	nso, err := MergeOverlay(
 		"/tmp",
 		"/mnt/titanfall",
@@ -212,4 +228,29 @@ func env(preserve []string, override ...string) []string {
 		r = append(r, override[i]+"="+override[i+1])
 	}
 	return r
+}
+
+func mounts(base ...string) ([]string, error) {
+	f, err := os.Open("/proc/mounts")
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	s := bufio.NewScanner(f)
+
+	var r []string
+	for s.Scan() {
+		v := strings.Fields(s.Text())
+		if len(v) < 4 {
+			continue
+		}
+		for _, x := range base {
+			if strings.HasPrefix(v[1], x) {
+				r = append(r, v[1]+" "+v[2]+" "+v[3])
+				continue
+			}
+		}
+	}
+	return r, s.Err()
 }
