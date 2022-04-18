@@ -171,7 +171,7 @@ func main() {
 
 	cmd := &exec.Cmd{
 		Path: "/usr/bin/nswrap",
-		Args: append(append([]string{"nswrap", nso.Path}, args...), strings.Repeat(" ", 256)),
+		Args: append(append([]string{"nswrap", nso.Path}, args...)),
 		Env: env([]string{"PATH", "HOSTNAME", "HOME", "USER", "WINEPREFIX", "WINESERVER"},
 			"NSWRAP_TITLE", sn,
 			"DISPLAY", "xvfb",
