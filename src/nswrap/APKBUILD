@@ -15,7 +15,7 @@ sha512sums="$(sha512sum $source)"
 
 build() {
 	mkdir -p "$builddir"
-	gcc -Wall -Wextra -Werror -Wno-trampolines -std=gnu11 -O3 "nswrap.c" -o "$builddir/nswrap"
+	gcc -Wall -Wextra -Werror -Wno-trampolines -std=gnu11 -O3 -DNSWRAP_HASH="$(sha256sum $source | head -c64)" "nswrap.c" -o "$builddir/nswrap"
 	cp "nswrap-wineprefix" "$builddir/nswrap-wineprefix"
 }
 

@@ -42,6 +42,7 @@
 #include <sys/types.h>
 #include <sys/signalfd.h>
 #include <sys/sysinfo.h>
+#include <sys/utsname.h>
 #include <sys/wait.h>
 
 /** The default value for WINEDEBUG if it is not provided (to clean up irrelevant log spam). */
@@ -890,6 +891,40 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    int np = nprocs();
+    struct sysinfo sinfo;
+    struct utsname uinfo;
+    if (sysinfo(&sinfo) == -1) {
+        perror("warning: failed to get system info: sysinfo");
+    } else if (uname(&uinfo) == -1) {
+        perror("warning: failed to get system info: uname");
+    } else {
+        #ifdef NSWRAP_HASH
+        #define NSWRAP_HASH__(x) #x
+        #define NSWRAP_HASH_(x) NSWRAP_HASH__(x)
+        ns_log("%s", NSWRAP_HASH_(NSWRAP_HASH));
+        ns_log("");
+        #undef NSWRAP_HASH_
+        #undef NSWRAP_HASH__
+        #endif
+        ns_log("config");
+        ns_log("  PATH=%s", getenv("PATH") ?: "(null)");
+        ns_log("  HOME=%s", getenv("HOME") ?: "(null)");
+        ns_log("  USER=%s", getenv("USER") ?: "(null)");
+        ns_log("  HOSTNAME=%s", getenv("HOSTNAME") ?: "(null)");
+        ns_log("  DISPLAY=%s", getenv("DISPLAY") ?: "(null)");
+        ns_log("  WINEPREFIX=%s", getenv("WINEPREFIX") ?: "(null)");
+        ns_log("  WINEDEBUG=%s", getenv("WINEDEBUG") ?: "(null)");
+        ns_log("  WINESERVER=%s", getenv("WINESERVER") ?: "(null)");
+        ns_log("");
+        ns_log("system info:");
+        ns_log("  kernel: %s %s %s %s %s", uinfo.sysname, uinfo.nodename, uinfo.release, uinfo.version, uinfo.machine);
+        ns_log("  processor: %d cores", np);
+        ns_log("  memory: %ld total, %ld free, %ld shared, %ld buffer", sinfo.totalram*sinfo.mem_unit, sinfo.freeram*sinfo.mem_unit, sinfo.sharedram*sinfo.mem_unit, sinfo.bufferram*sinfo.mem_unit);
+        ns_log("  swap: %ld total, %ld free", sinfo.totalswap*sinfo.mem_unit, sinfo.freeswap*sinfo.mem_unit);
+        ns_log("");
+    }
+
     const char *wineprefix = getenv("WINEPREFIX");
     if (!wineprefix || *wineprefix != '/' || access(wineprefix, F_OK|R_OK|W_OK|X_OK)) {
         if (!wineprefix) {
@@ -918,7 +953,6 @@ int main(int argc, char **argv) {
         ns_log("note: Xvfb is sufficient as long as you're using pg9182's d3d11 and gfsdk stubs");
     }
 
-    int np = nprocs();
     if (np < NS_REQUIRED_CORES) {
         ns_log("warning: currently, at least %d cores are required, but only %d were found", NS_REQUIRED_CORES, np);
     }
