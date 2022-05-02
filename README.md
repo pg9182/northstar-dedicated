@@ -410,7 +410,7 @@ To include additional mods, mount them under `/mnt/mods/`, which is equivalent t
 
 #### Navs
 
-To enable AI and auto-titans, navmeshes and graphs should be mounted to `/mnt/navs/` or a subdirectory. Prebuilt nav files can be found [here](https://github.com/taskinoz/Northstar-Navs). If a file conflicts with one already added, it will be overridden (in lexical order).
+To enable AI and auto-titans, navmeshes and graphs should be mounted to `/mnt/navs/` or a subdirectory. Prebuilt nav files can be found [here](https://github.com/taskinoz/Northstar-Navs). If a file conflicts with one already added, it will be overridden (in lexical order). On Northstar v1.7.0 and later, navmeshes are included for all maps by default.
 
 #### Environment variables
 
