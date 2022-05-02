@@ -22,7 +22,6 @@ check() {
 
 package() {
 	rm "$srcdir"/*.zip
-	rm -rf "$srcdir/bin/x64_retail"
 	mkdir -p "$pkgdir/usr/lib/northstar"
 	cp -r "$srcdir/." "$pkgdir/usr/lib/northstar/"
 }

@@ -74,6 +74,9 @@ func (n *NSOverlay) mergeTF(p string) error {
 }
 
 func (n *NSOverlay) mergeNS(p string) error {
+	if _, err := os.Stat(filepath.Join(p, "R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg")); err != nil {
+		return fmt.Errorf("northstar build missing server autoexec: %w", err)
+	}
 	for _, x := range []string{
 		"bin/x64_dedi/d3d11.dll",
 		"bin/x64_dedi/GFSDK_SSAO.win64.dll",
@@ -83,6 +86,14 @@ func (n *NSOverlay) mergeNS(p string) error {
 			return fmt.Errorf("northstar build missing stubs (is it 1.6 or newer?): %w", err)
 		}
 	}
+	for _, x := range []string{
+		"R2Northstar/mods/Northstar.CustomServers/mod/maps/navmesh",
+		"R2Northstar/mods/Northstar.CustomServers/mod/maps/graphs",
+	} {
+		if _, err := os.Stat(filepath.Join(p, x)); err != nil {
+			return fmt.Errorf("northstar build missing navs (is it 1.7 or newer?): %w", err)
+		}
+	}
 	// ns wants to write into it's directory, and it also doesn't seem to work
 	// properly if it's dir is symlinked...
 	return filepath.Walk(p, func(path string, info fs.FileInfo, err error) error {
@@ -90,8 +101,15 @@ func (n *NSOverlay) mergeNS(p string) error {
 		if err != nil {
 			return err
 		}
-		if info.Name() == "autoexec_ns_server.cfg" {
+		switch filepath.ToSlash(r) {
+		case "R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg":
 			return os.WriteFile(filepath.Join(n.Path, r), nil, 0666)
+		case
+			"discord_game_sdk.dll",
+			"bin/x64_retail",
+			"bin/x64_retail/wsock32.dll",
+			"R2Northstar/plugins/DiscordRPC.dll":
+			return nil
 		}
 		if info.IsDir() {
 			return os.MkdirAll(filepath.Join(n.Path, r), 0777)
