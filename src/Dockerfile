@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.2
 
-FROM alpine:3.15.0 AS base
+FROM alpine:3.15.4 AS base
 
 FROM base AS build
 RUN apk update && apk add alpine-sdk sudo
