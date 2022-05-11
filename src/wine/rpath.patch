@@ -1,8 +1,8 @@
 diff --git a/configure b/configure
-index dcce2e8644e..b0a060e5961 100755
+index f507d5fe6f0..c6c472cd066 100755
 --- a/configure
 +++ b/configure
-@@ -10858,6 +10858,38 @@ fi
+@@ -10526,6 +10526,38 @@ fi
      LIBWINE_DEPENDS="wine.map"
  
      TOP_INSTALL_LIB="$TOP_INSTALL_LIB libs/wine/libwine.so.$libwine_version libs/wine/libwine.so.$libwine_soversion"
@@ -42,10 +42,10 @@ index dcce2e8644e..b0a060e5961 100755
  esac
  
 diff --git a/configure.ac b/configure.ac
-index b42cb8a5346..c9c929ca911 100644
+index a405bf1773f..b9e1182fb20 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -859,6 +859,9 @@ case $host_os in
+@@ -852,6 +852,9 @@ case $host_os in
      AC_SUBST(LIBWINE_SHAREDLIB,"libwine.so.$libwine_version")
      AC_SUBST(LIBWINE_DEPENDS,"wine.map")
      TOP_INSTALL_LIB="$TOP_INSTALL_LIB libs/wine/libwine.so.$libwine_version libs/wine/libwine.so.$libwine_soversion"

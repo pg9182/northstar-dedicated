@@ -1,17 +1,17 @@
 diff --git a/dlls/ws2_32/socket.c b/dlls/ws2_32/socket.c
-index fe7e4fb3464..ef1449a4300 100644
+index 3d0c2deca35..f0b554e5d22 100644
 --- a/dlls/ws2_32/socket.c
 +++ b/dlls/ws2_32/socket.c
-@@ -1947,7 +1947,7 @@ static DWORD server_ioctl_sock( SOCKET s, DWORD code, LPVOID in_buff, DWORD in_s
+@@ -2071,7 +2071,7 @@ static DWORD server_ioctl_sock( SOCKET s, DWORD code, LPVOID in_buff, DWORD in_s
              return -1;
          status = piosb->u.Status;
      }
 -    if (status == STATUS_NOT_SUPPORTED)
 +    if (status == STATUS_NOT_SUPPORTED && ((code >> 2) & 0xfff) != 0xd2)
      {
-         FIXME("Unsupported ioctl %x (device=%x access=%x func=%x method=%x)\n",
+         FIXME("Unsupported ioctl %#lx (device=%#lx access=%#lx func=%#lx method=%#lx)\n",
                code, code >> 16, (code >> 14) & 3, (code >> 2) & 0xfff, code & 3);
-@@ -2270,6 +2270,8 @@ INT WINAPI WSAIoctl(SOCKET s, DWORD code, LPVOID in_buff, DWORD in_size, LPVOID
+@@ -2396,6 +2396,8 @@ INT WINAPI WSAIoctl(SOCKET s, DWORD code, LPVOID in_buff, DWORD in_size, LPVOID
      default:
          FIXME( "unimplemented ioctl %s\n", debugstr_wsaioctl( code ) );
          /* fall through */
