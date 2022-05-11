@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -77,6 +78,9 @@ func (n *NSOverlay) mergeNS(p string) error {
 	if _, err := os.Stat(filepath.Join(p, "R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg")); err != nil {
 		return fmt.Errorf("northstar build missing server autoexec: %w", err)
 	}
+	if _, err := os.Stat(filepath.Join(p, "R2Northstar/placeholder_playerdata.pdata")); err != nil {
+		return fmt.Errorf("northstar build missing placeholder pdata: %w", err)
+	}
 	for _, x := range []string{
 		"bin/x64_dedi/d3d11.dll",
 		"bin/x64_dedi/GFSDK_SSAO.win64.dll",
@@ -104,6 +108,8 @@ func (n *NSOverlay) mergeNS(p string) error {
 		switch filepath.ToSlash(r) {
 		case "R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg":
 			return os.WriteFile(filepath.Join(n.Path, r), nil, 0666)
+		case "R2Northstar/placeholder_playerdata.pdata":
+			return copyFile(path, filepath.Join(n.Path, r)) // northstar opens it read/write
 		case
 			"discord_game_sdk.dll",
 			"bin/x64_retail",
@@ -161,4 +167,34 @@ func checkedSymlink(oldname, newname string, replace bool) error {
 		}
 	}
 	return os.Symlink(oldname, newname)
+}
+
+func copyFile(src, dst string) error {
+	rf, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer rf.Close()
+
+	st, err := rf.Stat()
+	if err != nil {
+		return err
+	}
+
+	wf, err := os.OpenFile(dst, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, st.Mode())
+	if err != nil {
+		return err
+	}
+	defer wf.Close()
+
+	if _, err := io.Copy(wf, rf); err != nil {
+		os.Remove(wf.Name())
+		return err
+	}
+
+	if err := wf.Close(); err != nil {
+		os.Remove(wf.Name())
+		return err
+	}
+	return nil
 }
