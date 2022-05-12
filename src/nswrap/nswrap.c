@@ -286,6 +286,11 @@ static int xvfb(struct timespec timeout, int output_fd, pid_t *pid_out, char *er
                         *pid_out = pid;
                     }
 
+                    // dirty workaround for #29 (Xvfb write a separate newline after the display number and exits if it can't)
+                    nanosleep(&(struct timespec){
+                        .tv_nsec = 50 * 1000 * 1000,
+                    }, NULL);
+
                     close(displayfd[0]);
                     close(timerfd);
                     return x;
