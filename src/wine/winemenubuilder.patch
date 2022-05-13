@@ -1,8 +1,8 @@
 diff --git a/dlls/shell32/shelllink.c b/dlls/shell32/shelllink.c
-index 042b3bf5829..9ca915660cb 100644
+index 656357bf0a9..1e8c8de7920 100644
 --- a/dlls/shell32/shelllink.c
 +++ b/dlls/shell32/shelllink.c
-@@ -298,43 +298,7 @@ static HRESULT WINAPI IPersistFile_fnLoad(IPersistFile* iface, LPCOLESTR pszFile
+@@ -299,43 +299,7 @@ static HRESULT WINAPI IPersistFile_fnLoad(IPersistFile* iface, LPCOLESTR pszFile
  
  BOOL run_winemenubuilder( const WCHAR *args )
  {

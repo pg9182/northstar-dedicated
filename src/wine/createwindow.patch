@@ -1,31 +1,31 @@
-diff --git a/dlls/win32u/driver.c b/dlls/win32u/driver.c
-index f3c1d419b1d..e09e56a8244 100644
---- a/dlls/win32u/driver.c
-+++ b/dlls/win32u/driver.c
-@@ -754,16 +754,7 @@ static BOOL nulldrv_CreateDesktopWindow( HWND hwnd )
+diff --git a/dlls/user32/driver.c b/dlls/user32/driver.c
+index 73f4ee67257..f914333b534 100644
+--- a/dlls/user32/driver.c
++++ b/dlls/user32/driver.c
+@@ -161,16 +161,7 @@ static void CDECL nulldrv_UpdateClipboard(void)
  
- static BOOL nodrv_CreateWindow( HWND hwnd )
+ static BOOL CDECL nodrv_CreateWindow( HWND hwnd )
  {
 -    static int warned;
--    HWND parent = NtUserGetAncestor( hwnd, GA_PARENT );
+-    HWND parent = GetAncestor( hwnd, GA_PARENT );
 -
 -    /* HWND_MESSAGE windows don't need a graphics driver */
--    if (!parent || parent == NtUserGetThreadInfo()->msg_window) return TRUE;
+-    if (!parent || parent == get_user_thread_info()->msg_window) return TRUE;
 -    if (warned++) return FALSE;
 -
 -    ERR_(winediag)( "Application tried to create a window, but no driver could be loaded.\n" );
--    if (driver_load_error[0]) ERR_(winediag)( "%s\n", debugstr_w(driver_load_error) );
+-    if (driver_load_error[0]) ERR_(winediag)( "%s\n", driver_load_error );
 -    return FALSE;
 +    return TRUE;
  }
  
- static BOOL nulldrv_CreateWindow( HWND hwnd )
-@@ -841,7 +832,7 @@ static void nulldrv_SetWindowText( HWND hwnd, LPCWSTR text )
+ static BOOL CDECL nulldrv_CreateDesktopWindow( HWND hwnd )
+@@ -242,7 +233,7 @@ static void CDECL nulldrv_SetWindowText( HWND hwnd, LPCWSTR text )
  
- static UINT nulldrv_ShowWindow( HWND hwnd, INT cmd, RECT *rect, UINT swp )
+ static UINT CDECL nulldrv_ShowWindow( HWND hwnd, INT cmd, RECT *rect, UINT swp )
  {
 -    return ~0; /* use default implementation */
 +    return 0;
  }
  
- static LRESULT nulldrv_SysCommand( HWND hwnd, WPARAM wparam, LPARAM lparam )
+ static LRESULT CDECL nulldrv_SysCommand( HWND hwnd, WPARAM wparam, LPARAM lparam )
