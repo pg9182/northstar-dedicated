@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.2
 
-FROM alpine:3.16.0 AS base
+FROM alpine:3.15.4 AS base
 
 FROM base AS build
 RUN apk update && apk add alpine-sdk sudo
@@ -37,6 +37,9 @@ RUN --mount=from=build-northstar,source=/nsbuild/packages/main/x86_64,target=/ns
 RUN --mount=from=build-nswrap,source=/nsbuild/packages/main/x86_64,target=/nsbuild/nswrap \
     --mount=from=build-entrypoint,source=/nsbuild/packages/main/x86_64,target=/nsbuild/entrypoint \
     apk add --no-cache --allow-untrusted /nsbuild/nswrap/*.apk /nsbuild/entrypoint/*.apk
+
+# silence Xvfb xkbcomp warnings by working around the bug (present in libX11 1.7.2) fixed in libX11 1.8 by https://gitlab.freedesktop.org/xorg/lib/libx11/-/merge_requests/79
+RUN echo 'partial xkb_symbols "evdev" {};' > /usr/share/X11/xkb/symbols/inet
 
 RUN adduser -D northstar && \
     echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
