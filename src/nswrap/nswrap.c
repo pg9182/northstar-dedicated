@@ -672,6 +672,11 @@ slow:
             case '1':
                 p->output.state = 23;
                 break;
+            case '3': // text attr: foreground
+            case '4': // text attr: background
+            case '9': // text attr: foreground light
+                p->output.state = 33;
+                break;
             case 'K':
                 // ignore the CR equivalent
                 p->output.state = 0;
@@ -743,6 +748,15 @@ slow:
                 p->output.b_out[p->output.n_out++] = ' ';
                 break;
             }
+            break;
+        case 33: // inside text attributes (i.e., ignore anything until an invalid attr char or an 'm' to terminate it)
+            if (c == ';')
+                break; // separator
+            if (c >= '0' && c <= '9')
+                break; // attribute
+            if (c != 'm')
+                p->output.b_out[p->output.n_out++] = c; // invalid char, so output it
+            p->output.state = 0;
             break;
         }
     }
