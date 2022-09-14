@@ -672,6 +672,9 @@ slow:
             case '1':
                 p->output.state = 23;
                 break;
+            case 'm': // text attr: end
+                p->output.state = 0;
+                break;
             case '3': // text attr: foreground
             case '4': // text attr: background
             case '9': // text attr: foreground light
