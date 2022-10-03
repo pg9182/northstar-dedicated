@@ -205,8 +205,8 @@ build() {
 		--disable-xactengine3_1 --disable-xactengine3_2 --disable-xactengine3_3 --disable-xactengine3_4 --disable-xactengine3_5 --disable-xactengine3_6 \
 		--disable-xactengine3_7 --disable-xapofx1_1 --disable-xapofx1_2 --disable-xapofx1_3 --disable-xapofx1_4 --disable-xapofx1_5 --disable-xaudio2_0 \
 		--disable-xaudio2_1 --disable-xaudio2_2 --disable-xaudio2_3 --disable-xaudio2_4 --disable-xaudio2_5 --disable-xaudio2_6 --disable-xaudio2_7 \
-		--disable-xaudio2_8 --disable-xaudio2_9 --disable-xinput1_1 --disable-xinput1_2 --disable-xinput1_4 --disable-xinput9_1_0 --disable-xmllite \
-		--disable-xolehlp --disable-xpsprint --disable-xpssvcs
+		--disable-xaudio2_8 --disable-xaudio2_9 --disable-xinput1_1 --disable-xinput1_2 --disable-xinput1_4 --disable-xmllite --disable-xolehlp \
+		--disable-xpsprint --disable-xpssvcs
 		#
 		## note: first iteration was done with ghcr.io/pg9182/northstar-dedicated:1.20220116.gite7a0ed9-tf2.0.11.0-ns1.4.0 (i.e. a mostly vanilla wine 6.23 build)
 		## libs_wineprefix=activeds advapi32 advpack atl100 avicap32 bcrypt cng combase comctl32 comdlg32 conhost crypt32 cryptdlg cryptnet cryptui devenum dnsapi dsound explorer fltmgr gdi32 hh hidclass hidparse http ieframe iexplore imaadp32 imm32 iphlpapi kernel32 kernelbase ksecdd l3codeca light mlang mofcomp mountmgr mp3dmod mpr msacm32 msado15 msadp32 msdaps msdasql msdmo msg711 msgsm32 msisip msvcrt msvfw32 msxml msxml2 msxml3 msxml4 msxml6 ndis netio newdev notepad nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 oledb32 powershell propsys qcap qedit quartz reg regedit rpcrt4 rsaenh rundll32 sapi scsiport sechost services setupapi shcore shdocvw shell32 shlwapi start tdi tzres ucrtbase urlmon usbd user32 userenv uxtheme version wbemdisp wbemprox win32u windows windowscodecs wineboot winebus winedevice winehid winemenubuilder wineps winevulkan winex11 winexinput wininet winmm winspool wintrust wmic wmiutils wmplayer wordpad ws2_32
@@ -219,6 +219,8 @@ build() {
 		## libs_nsdedi=actxprxy advapi32 api-ms-win-crt-convert-l1-1-0 api-ms-win-crt-environment-l1-1-0 api-ms-win-crt-filesystem-l1-1-0 api-ms-win-crt-heap-l1-1-0 api-ms-win-crt-locale-l1-1-0 api-ms-win-crt-math-l1-1-0 api-ms-win-crt-runtime-l1-1-0 api-ms-win-crt-stdio-l1-1-0 api-ms-win-crt-string-l1-1-0 api-ms-win-crt-time-l1-1-0 api-ms-win-crt-utility-l1-1-0 avifil32 bcrypt combase comctl32 concrt140 conhost crypt32 dbghelp dnsapi dsound explorer gdi32 hid hidclass hidparse imm32 iphlpapi kerberos kernel32 kernelbase mmdevapi mountmgr msacm32 msv1_0 msvcp110 msvcp140 msvcr110 msvcrt msvfw32 ndis netapi32 normaliz nsi nsiproxy ntdll ntoskrnl ole32 oleaut32 opengl32 plugplay psapi rpcrt4 rpcss rsaenh schannel sechost secur32 services setupapi shcore shell32 shlwapi svchost tzres ucrtbase user32 userenv uxtheme vcruntime140 vcruntime140_1 version wevtsvc win32u wineboot winebus winedevice winehid winex11 winmm wldap32 ws2_32 wsock32 xinput1_3
 		## https://gist.github.com/pg9182/9cdc3e8fe52aafc137d7f114b99fa420
 		## the additional disables were based on manual inspection of dlls only loaded twice during wineprefix setup and by manually checking for thirdparty libs not referenced anymore due to the removals (I'm keeping those --without flags separate since they only work if we're disabling some of the dlls)
+		#
+		## 2022/10/03 (ns > 1.9.6) - add back xinput_9_1_0 for the xinput aslr fixes
 		#
 		# ctr="$(docker run --detach --tty --rm -e NS_SERVER_NAME=test ... --entrypoint /bin/ash ghcr.io/pg9182/northstar-dedicated:1.20220117.git5ce2886-tf2.0.11.0-ns1.4.0)"
 		# docker exec "$ctr" sudo apk add inotify-tools
