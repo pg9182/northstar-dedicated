@@ -426,6 +426,7 @@ The following environment variables are mapped to convars or command-line argume
 | NS_MASTERSERVER_URL       | The base URL of the master server. |
 | NS_MASTERSERVER_REGISTER  | True/false for whether the server should register with the master server. If false, you will probably want to set NS_INSECURE to true. |
 | NS_INSECURE               | Whether to allow unauthenticated direct connections to the server. |
+| NS_CHAN_LIMIT_MODE        | Explicitly set net_chan_limit_mode. Setting this to 0, would not kick clients that go over the limit |
 
 In `NS_SERVER_NAME` and `NS_SERVER_DESC`, `{{hostname}}` will be replaced with the container's hostname (usually a short random string). This is useful to easily start and identify multiple instances dynamically, or to match instances with container logs.
 

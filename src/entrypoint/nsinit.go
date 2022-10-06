@@ -129,6 +129,7 @@ func main() {
 			"ns_server_desc":                      "NS_SERVER_DESC",
 			"ns_server_password":                  "NS_SERVER_PASSWORD",
 			"ns_masterserver_hostname":            "NS_MASTERSERVER_URL",
+			"net_chan_limit_mode":                 "NS_NET_CHAN_LIMIT_MODE",
 			"ns_report_server_to_masterserver":    "NS_MASTERSERVER_REGISTER",
 			"ns_report_sp_server_to_masterserver": "NS_MASTERSERVER_REGISTER",
 			"ns_auth_allow_insecure":              "NS_INSECURE",
