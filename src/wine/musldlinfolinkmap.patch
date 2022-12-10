@@ -1,0 +1,17 @@
+diff --git a/dlls/winecrt0/dll_soinit.c b/dlls/winecrt0/dll_soinit.c
+index e0ed9a1be1e..f1eeed5f953 100644
+--- a/dlls/winecrt0/dll_soinit.c
++++ b/dlls/winecrt0/dll_soinit.c
+@@ -92,7 +92,11 @@ void __wine_init_so_dll(void)
+     Dl_info info;
+     if (!dladdr1( __wine_init_so_dll, &info, (void **)&map, RTLD_DL_LINKMAP )) return;
+ #else
+-    if (dlinfo( RTLD_SELF, RTLD_DI_LINKMAP, &map )) return;
++    Dl_info info;
++    void *handle;
++    if (!dladdr( __wine_init_so_dll, &info )) return;
++    if (!(handle = dlopen( info.dli_fname, RTLD_NOLOAD ))) return;
++    if (dlinfo( handle, RTLD_DI_LINKMAP, &map )) map = NULL;
+ #endif
+ 
+     for (dyn = map->l_ld; dyn->d_tag; dyn++)

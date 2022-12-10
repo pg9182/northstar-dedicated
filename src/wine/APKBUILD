@@ -1,6 +1,6 @@
 # Maintainer: pg9182 <96569817+pg9182@users.noreply.github.com>
 pkgname=northstar-dedicated-wine
-pkgver=7.0
+pkgver=8.0_rc1
 pkgrel=0
 pkgdesc="Patched Wine build for the Northstar dedicated server"
 
@@ -13,21 +13,14 @@ subpackages="$pkgname-dev $pkgname-doc"
 depends_dev="$pkgname perl"
 makedepends="autoconf automake bison flex gnutls-dev libxi-dev mingw-w64-gcc mingw-w64-binutils linux-headers"
 
-# note: I've disabled the CreateWindow patch (which was to remove the need for
-# X11 to run the dedicated server) since it seems to cause time to slow down
-# in-game (possibly caused by the 6+ repeated calls to PeekMessage for the
-# window handle in-between ticks). This will need more debugging later.
-
 options="textrels !check"
-source="https://dl.winehq.org/wine/source/7.0/wine-$pkgver.tar.xz
+source="https://dl.winehq.org/wine/source/8.0/wine-8.0-rc1.tar.xz
+	musldlinfolinkmap.patch
 	rpath.patch
 	winemenubuilder.patch
-	ws2siobacklogquery.patch
-	wine-mr-1034.patch
 	"
-#	createwindow.patch
 
-builddir="$srcdir/wine-$pkgver"
+builddir="$srcdir/wine-8.0-rc1"
 
 build() {
 	local _win64 _no_pie
@@ -298,10 +291,8 @@ doc() {
 }
 
 sha512sums="
-eec17b046ed5447eb540f421c9b2748d9419ce087496c2743a9914fd27bbe5ff9da0cfe47d3cd76fa97323bd1188a1d82b1eef4968d86ed1957dc1a95e28529c  wine-7.0.tar.xz
-1f023ec35610d7f39eee5ee8e53abf8905509dd37513a1ec00f498e5e28890c60555d43daeae28b806879050b3422575f3552fa338177e923b0471c89418a607  rpath.patch
-eaaa991510d6de7f33ea8d81954737ab4a18f40675f3fa5822367fe40e439880246209d913f646e80e1120d59fcedaf97d069cf1b203c0d7d032bc8b07faa29d  winemenubuilder.patch
-bf1630e4f8aab6b220eb95beafe2891549bb6d7be17aed9bbd1269409fd589f05fc9b68c123d58cdfc5eff60d53518b232c59b6c4648b7c6e36a2416f4913d33  ws2siobacklogquery.patch
-caa47044e6caa5edb3f55596bfcc96c0e6166a7d84bc66e13813a1665e27b15524ac4db3bc354d89491d0ba2e8356075141fc21e21662d1469843699e9088da1  wine-mr-1034.patch
+837a5bedd7962bb7bfb8f8a8bc7358a3e4a1482bcdfe3ddb9396e6c7d6eae83b15f52b0512957384cdb4974be40cac40577c38e39c054dbcea0e6b8a5d714bdc  wine-8.0-rc1.tar.xz
+0b2fab89fb8969cb181e0957fa1b68b081f195a7d02badf41d39050fa496aa9838446ba43e5bb48e8ee44f69999e184aabd4e50f06c286e7ca59f35284b335f7  musldlinfolinkmap.patch
+0cf22f6a54e3c30fb5f9b29c60ff2a8c002f6c1a2771b94ad5bf70a44ed18a400e9077873a8be4f2f2d4abe00976af69d9e88d662f117ffce7f5e6a8682d0d73  rpath.patch
+a0f5040fea1e9d27ee77bb7abf991369e1003b9bebd35c54dcdde1a5293bb505b3f8f7f64121459576286e3b51ef38c5173997831d285ba23b572b37857449b7  winemenubuilder.patch
 "
-#996a6fcf19875b170eb51ccd6f4e5ec32f77326a7ab8c6227c0fa4e3acacf9330efeafdb77de17a176e73d1ec7f58cac3293302833284ce805b6b5e751f9615e  createwindow.patch
