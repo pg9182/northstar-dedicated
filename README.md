@@ -382,6 +382,8 @@ make -C wine-build install DESTDIR=$PWD/wine-pkg</pre></code>
 <b>Note:</b> DXVK will always use your physical adapter instead of lavapipe if you have one present unless you patch <a href="https://github.com/doitsujin/dxvk/blob/94674ac45e8a4618c00519e04b254de76aad35a2/src/dxvk/dxvk_device_filter.cpp#L33">this check</a>.
 </p></td></tr></tbody></table></details>
 
+**Warning:** Wine ~7.8 (possibly earlier) to 8.0 have known severe performance regressions with Northstar, causing stuttering, lagging, and an extremely slow timescale. This is presumably due to the unixlib and PE restructuring. Wine 8.0's syscall and unixlib perf improvements seem to have resolved this.
+
 ### Tracing
 
 While working on the stubs, I needed to trace which DirectX calls Titanfall uses. You can do this by running it under WineD3D (with llvmpipe so it isn't polluted or made inconsistent by the hardware) and `WINEDEBUG=trace+d3d11,trace+dxgi`. Beware that this may have more than what is directly called by Titanfall due to internal implementation details of WineD3D.
