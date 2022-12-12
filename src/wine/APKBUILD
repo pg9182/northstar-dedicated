@@ -177,7 +177,7 @@ build() {
 		--disable-mf3216 --disable-mferror --disable-mfmediaengine --disable-mfplat --disable-mfplay --disable-mfreadwrite --disable-mgmtapi \
 		--disable-midimap --disable-mmcndmgr --disable-msasn1 --disable-mscat32 --disable-mscms --disable-mscoree --disable-mscorwks --disable-msctf \
 		--disable-msctfmonitor --disable-msctfp --disable-msdelta --disable-msdrm --disable-msftedit --disable-mshtml --disable-mshtml_tlb --disable-msi \
-		--disable-msident --disable-msimg32 --disable-msimsg --disable-msimtf --disable-msisys_ocx --disable-msls31 --disable-msnet32 --disable-mspatcha \
+		--disable-msident --disable-msimsg --disable-msimtf --disable-msisys_ocx --disable-msls31 --disable-msnet32 --disable-mspatcha \
 		--disable-msports --disable-msrle32 --disable-msscript_ocx --disable-mssign32 --disable-mssip32 --disable-mstask --disable-msvcirt --disable-msvcm80 \
 		--disable-msvcm90 --disable-msvcp100 --disable-msvcp120 --disable-msvcp120_app --disable-msvcp60 --disable-msvcp70 --disable-msvcp71 \
 		--disable-msvcp80 --disable-msvcp90 --disable-msvcp_win --disable-msvcr100 --disable-msvcr120 --disable-msvcr120_app --disable-msvcr70 \
@@ -222,6 +222,7 @@ build() {
 		## the additional disables were based on manual inspection of dlls only loaded twice during wineprefix setup and by manually checking for thirdparty libs not referenced anymore due to the removals (I'm keeping those --without flags separate since they only work if we're disabling some of the dlls)
 		#
 		## 2022/10/03 (ns > 1.9.6) - add back xinput_9_1_0 for the xinput aslr fixes
+		## 2022/12/12 (ns > 1.11.0) - add back msimg32 for the splash screen stuff
 		#
 		# ctr="$(docker run --detach --tty --rm -e NS_SERVER_NAME=test ... --entrypoint /bin/ash ghcr.io/pg9182/northstar-dedicated:1.20220117.git5ce2886-tf2.0.11.0-ns1.4.0)"
 		# docker exec "$ctr" sudo apk add inotify-tools
