@@ -42,11 +42,11 @@ done
 printf "%s\n" "${tags[@]}"
 
 if [[ ${GITHUB_ACTIONS-} == "true" ]]; then
-    echo "::set-output name=tags::$(IFS=","; echo "${tags[*]}")"
-    echo "::set-output name=ever::${seg_ever}"
-    echo "::set-output name=nsver::${seg_nsver}"
-    echo "::set-output name=tfver::${seg_tfver}"
-    echo "::set-output name=git::${seg_git}"
-    echo "::set-output name=yymmdd::${seg_yymmdd}"
-    echo "::set-output name=rfc3339::${seg_rfc3339}"
+    echo "tags=$(IFS=","; echo "${tags[*]}")" >> $GITHUB_OUTPUT
+    echo "ever=${seg_ever}" >> $GITHUB_OUTPUT
+    echo "nsver=${seg_nsver}" >> $GITHUB_OUTPUT
+    echo "tfver=${seg_tfver}" >> $GITHUB_OUTPUT
+    echo "git=${seg_git}" >> $GITHUB_OUTPUT
+    echo "yymmdd=${seg_yymmdd}" >> $GITHUB_OUTPUT
+    echo "rfc3339=${seg_rfc3339}" >> $GITHUB_OUTPUT
 fi
