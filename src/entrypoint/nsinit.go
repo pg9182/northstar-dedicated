@@ -68,6 +68,7 @@ func main() {
 		"/usr/lib/northstar",
 		"/mnt/mods",
 		"/mnt/navs",
+		"/mnt/plugins",
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Failed to merge game files: %v.\n", err)
@@ -108,7 +109,6 @@ func main() {
 			"ns_report_sp_server_to_masterserver": "0",
 			"ns_auth_allow_insecure":              "0",
 			"ns_erase_auth_info":                  "1",
-			"ns_player_auth_port":                 "8081",
 			"ns_masterserver_hostname":            "https://northstar.tf",
 			"everything_unlocked":                 "1",
 			"ns_should_return_to_lobby":           "1",
@@ -124,7 +124,6 @@ func main() {
 		},
 		map[string]string{
 			// only include commonly-used ones here
-			"ns_player_auth_port":                 "NS_PORT_AUTH",
 			"ns_server_name":                      "NS_SERVER_NAME",
 			"ns_server_desc":                      "NS_SERVER_DESC",
 			"ns_server_password":                  "NS_SERVER_PASSWORD",
@@ -147,6 +146,9 @@ func main() {
 		}
 		os.Exit(2)
 		return
+	}
+	if os.Getenv("NS_PORT_AUTH") != "" {
+		fmt.Fprintf(os.Stderr, "Note: NS_PORT_AUTH is no longer necessary since Northstar v1.13.\n")
 	}
 	fmt.Println()
 	nsc.Display(os.Stdout, "    ")
@@ -171,7 +173,7 @@ func main() {
 
 	cmd := &exec.Cmd{
 		Path: "/usr/bin/nswrap",
-		Args: append(append([]string{"nswrap", nso.Path}, args...)),
+		Args: append([]string{"nswrap", nso.Path}, args...),
 		Env: env([]string{"PATH", "HOSTNAME", "HOME", "USER", "WINEPREFIX", "WINESERVER"},
 			"NSWRAP_TITLE", sn,
 			"DISPLAY", "xvfb",

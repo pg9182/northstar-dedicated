@@ -412,6 +412,10 @@ To include additional mods, mount them under `/mnt/mods/`, which is equivalent t
 
 To enable AI and auto-titans, navmeshes and graphs should be mounted to `/mnt/navs/` or a subdirectory. Prebuilt nav files can be found [here](https://github.com/taskinoz/Northstar-Navs). If a file conflicts with one already added, it will be overridden (in lexical order). On Northstar v1.7.0 and later, navmeshes are included for all maps by default.
 
+#### Plugins
+
+To include additional plugins, mount them under `/mnt/plugins/`, which is equivalent to the `R2Northstar/plugins` folder.
+
 #### Environment variables
 
 The following environment variables are mapped to convars or command-line arguments as necessary and will continue to be supported in releases of the image with the same major version. The default values are based on official Northstar releases and can be found in [nsinit.go](./src/entrypoint/nsinit.go).
@@ -422,7 +426,7 @@ The following environment variables are mapped to convars or command-line argume
 | NS_SERVER_DESC            | The server description to show in the server browser. |
 | NS_SERVER_PASSWORD        | The password for the server. If empty, the server is public. |
 | NS_PORT                   | The UDP game port. Must match with the forwarded port and be accessible from the default external IP. |
-| NS_PORT_AUTH              | The TCP player authentication port. Must match with the forwarded port and be accessible from the default external IP. |
+| NS_PORT_AUTH              | **Not for Northstar v1.13 and later.** The TCP player authentication port. Must match with the forwarded port and be accessible from the default external IP. |
 | NS_MASTERSERVER_URL       | The base URL of the master server. |
 | NS_MASTERSERVER_REGISTER  | True/false for whether the server should register with the master server. If false, you will probably want to set NS_INSECURE to true. |
 | NS_INSECURE               | Whether to allow unauthenticated direct connections to the server. |
@@ -459,7 +463,6 @@ services:
     pull_policy: always
     environment:
       - NS_PORT=37015
-      - NS_PORT_AUTH=8081
       - 'NS_SERVER_NAME=your server name'
       - 'NS_SERVER_DESC=your server description'
       - |
@@ -473,7 +476,6 @@ services:
       - /path/to/titanfall:/mnt/titanfall:ro
     ports:
       - '37015:37015/udp'
-      - '8081:8081/tcp'
     restart: always
 ```
 
@@ -497,7 +499,6 @@ services:
     pull_policy: always
     environment:
       - NS_PORT=37015
-      - NS_PORT_AUTH=37115
       - 'NS_SERVER_NAME=your server name, possibly with {{hostname}}'
       - 'NS_SERVER_DESC=your server description, which can also include {{hostname}}'
       - NS_RETURN_TO_LOBBY=0
@@ -514,18 +515,14 @@ services:
         +net_compresspackets 1
         +spewlog_enable 0
         +sv_maxrate 127000
-        +rcon_admin 1009497984978
-        +grant_admin 1009497984978
-        +autoannounce "map console (`) commands: !skip to vote skip, !extend to vote extend"
     volumes:
       - ./titanfall/2.0.11.0-dedicated-mp:/mnt/titanfall:ro
       - ./navs:/mnt/navs:ro
-      - ./mods/RCON:/mnt/mods/RCON:ro
-      - ./mods/Karma.Abuse:/mnt/mods/Karma.Abuse:ro
-      - ./mods/Takyon.PlayerVote:/mnt/mods/Takyon.PlayerVote:ro
+      - ./mods/Fifty.ServerUtilities:/mnt/mods/Fifty.ServerUtilities:ro
+      - ./mods/Fifty.ServerChatCommands:/mnt/mods/Fifty.ServerChatCommands:ro
+      - ./plugins/whatever.dll:/mnt/plugins/whatever.dll
     ports:
       - '37015:37015/udp'
-      - '37115:37115/tcp'
     restart: always
 ```
 

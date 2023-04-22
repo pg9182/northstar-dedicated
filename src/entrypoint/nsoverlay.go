@@ -6,13 +6,14 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type NSOverlay struct {
 	Path string
 }
 
-func MergeOverlay(dir, tfPath, nsPath, modsPath, navsPath string) (*NSOverlay, error) {
+func MergeOverlay(dir, tfPath, nsPath, modsPath, navsPath, pluginsPath string) (*NSOverlay, error) {
 	n := new(NSOverlay)
 	if p, err := os.MkdirTemp(dir, "ns*"); err != nil {
 		return nil, fmt.Errorf("create temp dir in %q: %w", dir, err)
@@ -34,6 +35,10 @@ func MergeOverlay(dir, tfPath, nsPath, modsPath, navsPath string) (*NSOverlay, e
 	if err := n.mergeNavs(navsPath); err != nil {
 		n.Delete()
 		return nil, fmt.Errorf("merge navs: %w", err)
+	}
+	if err := n.mergePlugins(pluginsPath); err != nil {
+		n.Delete()
+		return nil, fmt.Errorf("merge plugins: %w", err)
 	}
 	return n, nil
 }
@@ -109,7 +114,9 @@ func (n *NSOverlay) mergeNS(p string) error {
 		case "R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg":
 			return os.WriteFile(filepath.Join(n.Path, r), nil, 0666)
 		case "R2Northstar/placeholder_playerdata.pdata":
-			return copyFile(path, filepath.Join(n.Path, r)) // northstar opens it read/write
+			// northstar after v1.10.0 doesn't need this file anymore
+			// northstar until v1.8.1 opens it read/write, so must copy
+			return copyFile(path, filepath.Join(n.Path, r))
 		case
 			"discord_game_sdk.dll",
 			"bin/x64_retail",
@@ -144,6 +151,9 @@ func (n *NSOverlay) mergeMods(p string) error {
 func (n *NSOverlay) mergeNavs(p string) error {
 	// note: sorted lexically
 	return filepath.Walk(p, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.IsDir() {
 			return nil
 		}
@@ -152,6 +162,25 @@ func (n *NSOverlay) mergeNavs(p string) error {
 			return checkedSymlink(path, filepath.Join(n.Path, "R2Northstar", "mods", "Northstar.CustomServers", "mod", "maps", "graphs", info.Name()), true)
 		case ".nm":
 			return checkedSymlink(path, filepath.Join(n.Path, "R2Northstar", "mods", "Northstar.CustomServers", "mod", "maps", "navmesh", info.Name()), true)
+		}
+		return nil
+	})
+}
+
+func (n *NSOverlay) mergePlugins(p string) error {
+	// note: sorted lexically
+	if err := os.MkdirAll(filepath.Join(n.Path, "R2Northstar", "plugins"), 0644); err != nil {
+		return err
+	}
+	return filepath.Walk(p, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if strings.ToLower(filepath.Ext(path)) == ".dll" {
+			return checkedSymlink(path, filepath.Join(n.Path, "R2Northstar", "plugins", info.Name()), true)
 		}
 		return nil
 	})

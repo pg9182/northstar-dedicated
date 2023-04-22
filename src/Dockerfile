@@ -43,7 +43,7 @@ RUN echo 'partial xkb_symbols "evdev" {};' > /usr/share/X11/xkb/symbols/inet
 
 RUN adduser -D northstar && \
     echo 'northstar ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/northstar && \
-    mkdir /mnt/titanfall /mnt/mods /mnt/navs
+    mkdir /mnt/titanfall /mnt/mods /mnt/navs /mnt/plugins
 USER northstar
 
 ENV WINEPREFIX="/home/northstar/.wine"
