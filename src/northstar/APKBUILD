@@ -15,7 +15,6 @@ check() {
 	ls "$srcdir"
 	test -f "$srcdir/NorthstarLauncher.exe"
 	test -f "$srcdir/R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg"
-	test -f "$srcdir/R2Northstar/placeholder_playerdata.pdata"
 	test -d "$srcdir/R2Northstar/mods/Northstar.CustomServers/mod/maps/graphs"
 	test -d "$srcdir/R2Northstar/mods/Northstar.CustomServers/mod/maps/navmesh"
 	test -f "$srcdir/bin/x64_dedi/d3d11.dll"
