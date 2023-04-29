@@ -83,9 +83,6 @@ func (n *NSOverlay) mergeNS(p string) error {
 	if _, err := os.Stat(filepath.Join(p, "R2Northstar/mods/Northstar.CustomServers/mod/cfg/autoexec_ns_server.cfg")); err != nil {
 		return fmt.Errorf("northstar build missing server autoexec: %w", err)
 	}
-	if _, err := os.Stat(filepath.Join(p, "R2Northstar/placeholder_playerdata.pdata")); err != nil {
-		return fmt.Errorf("northstar build missing placeholder pdata: %w", err)
-	}
 	for _, x := range []string{
 		"bin/x64_dedi/d3d11.dll",
 		"bin/x64_dedi/GFSDK_SSAO.win64.dll",
