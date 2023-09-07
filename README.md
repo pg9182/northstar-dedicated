@@ -416,6 +416,10 @@ To enable AI and auto-titans, navmeshes and graphs should be mounted to `/mnt/na
 
 To include additional plugins, mount them under `/mnt/plugins/`, which is equivalent to the `R2Northstar/plugins` folder.
 
+#### Save Data
+
+To persist save data from mods, mount a folder read-write to `/mnt/save_data` or a subdirectory (to limit it to a single mod). Note that some mods may or may not support sharing save data across multiple servers concurrently.
+
 #### Environment variables
 
 The following environment variables are mapped to convars or command-line arguments as necessary and will continue to be supported in releases of the image with the same major version. The default values are based on official Northstar releases and can be found in [nsinit.go](./src/entrypoint/nsinit.go).

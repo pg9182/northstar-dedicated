@@ -13,7 +13,7 @@ type NSOverlay struct {
 	Path string
 }
 
-func MergeOverlay(dir, tfPath, nsPath, modsPath, navsPath, pluginsPath string) (*NSOverlay, error) {
+func MergeOverlay(dir, tfPath, nsPath, modsPath, navsPath, pluginsPath, saveDataPath string) (*NSOverlay, error) {
 	n := new(NSOverlay)
 	if p, err := os.MkdirTemp(dir, "ns*"); err != nil {
 		return nil, fmt.Errorf("create temp dir in %q: %w", dir, err)
@@ -39,6 +39,10 @@ func MergeOverlay(dir, tfPath, nsPath, modsPath, navsPath, pluginsPath string) (
 	if err := n.mergePlugins(pluginsPath); err != nil {
 		n.Delete()
 		return nil, fmt.Errorf("merge plugins: %w", err)
+	}
+	if err := n.mergeSaveData(saveDataPath); err != nil {
+		n.Delete()
+		return nil, fmt.Errorf("merge save data: %w", err)
 	}
 	return n, nil
 }
@@ -181,6 +185,10 @@ func (n *NSOverlay) mergePlugins(p string) error {
 		}
 		return nil
 	})
+}
+
+func (n *NSOverlay) mergeSaveData(p string) error {
+	return checkedSymlink(p, filepath.Join(n.Path, "R2Northstar", "save_data"), true)
 }
 
 func checkedSymlink(oldname, newname string, replace bool) error {

@@ -69,6 +69,7 @@ func main() {
 		"/mnt/mods",
 		"/mnt/navs",
 		"/mnt/plugins",
+		"/mnt/save_data",
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Failed to merge game files: %v.\n", err)
