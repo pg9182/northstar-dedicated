@@ -135,7 +135,7 @@ build() {
 		--disable-api_ms_win_shell_shellfolders_l1_1_0 --disable-apphelp --disable-appwiz_cpl --disable-atl --disable-atl110 --disable-atl80 --disable-atl90 \
 		--disable-atlthunk --disable-atmlib --disable-authz --disable-avrt --disable-bluetoothapis --disable-browseui --disable-bthprops_cpl \
 		--disable-cabinet --disable-capi2032 --disable-cards --disable-cdosys --disable-cfgmgr32 --disable-clusapi --disable-comcat --disable-compstui \
-		--disable-comsvcs --disable-connect --disable-credui --disable-crtdll --disable-cryptdll --disable-cryptext --disable-cryptsp --disable-ctapi32 \
+		--disable-comsvcs --disable-connect --disable-credui --disable-crtdll --disable-cryptext --disable-cryptsp --disable-ctapi32 \
 		--disable-ctl3d32 --disable-d2d1 --disable-d3d10 --disable-d3d10_1 --disable-d3d10core --disable-d3d11 --disable-d3d12 --disable-d3d8 \
 		--disable-d3d8thk --disable-d3d9 --disable-d3dcompiler_33 --disable-d3dcompiler_34 --disable-d3dcompiler_35 --disable-d3dcompiler_36 \
 		--disable-d3dcompiler_37 --disable-d3dcompiler_38 --disable-d3dcompiler_39 --disable-d3dcompiler_40 --disable-d3dcompiler_41 --disable-d3dcompiler_42 \
