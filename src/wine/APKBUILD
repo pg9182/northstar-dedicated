@@ -55,7 +55,6 @@ build() {
 		--without-gssapi \
 		--without-gstreamer \
 		--without-inotify \
-		--without-krb5 \
 		--without-ldap \
 		--with-mingw \
 		--without-netapi \
